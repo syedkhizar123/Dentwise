@@ -4,12 +4,70 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  clerkId      String        @unique
+  email        String        @unique
+  firstName    String?
+  lastName     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
+  appointments Appointment[]
+
+  @@map("users")
+}
+
+model Doctor {
+  id           String        @id @default(cuid())
+  name         String
+  email        String
+  phone        String
+  speciality   String
+  bio          String?
+  imageUrl     String
+  gender       Gender
+  isActive     Boolean
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
+  appointments Appointment[]
+
+  @@map("doctors")
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  date      DateTime
+  time      String
+  duration  Int               @default(30)
+  status    AppointmentStatus @default(CONFIRMED)
+  notes     String?
+  reason    String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  userId   String
+  doctorId String
+
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("appointments")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  COMPLETED
 }
