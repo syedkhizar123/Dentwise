@@ -9,13 +9,11 @@ export const createDoctor = async (req: Request) => {
     try {
 
         const user = await requireAuth()
-   
 
         const body = await req.json()
-        console.log("BODY:", body)
 
-        const { name, email, phone, speciality, gender, isActive , bio} = body
-        if (!name || !email || !phone || !speciality || !gender || isActive === undefined ) {
+        const { name, email, phone, speciality, gender, isActive, bio } = body
+        if (!name || !email || !phone || !speciality || !gender || isActive === undefined) {
             return {
                 status: 400,
                 msg: "All fields are required"
@@ -56,9 +54,63 @@ export const createDoctor = async (req: Request) => {
     }
 }
 
+export const updateDoctor = async (req: Request, id: string) => {
+    try {
+        const user = await requireAuth()
+
+        const body = await req.json()
+        const {
+            name,
+            email,
+            bio,
+            speciality,
+            phone,
+            gender,
+            isActive
+        } = body
+
+        const updatedData: any = {}
+
+        if (name !== undefined) updatedData.name = name
+        if (email !== undefined) updatedData.email = email
+        if (bio !== undefined) updatedData.bio = bio
+        if (speciality !== undefined) updatedData.speciality = speciality
+        if (phone !== undefined) updatedData.phone = phone
+        if (gender !== undefined) updatedData.gender = gender
+        if (isActive !== undefined) updatedData.isActive = isActive
+
+        if (gender === "MALE") {
+            updatedData.imageUrl = "https://xerothermic-black-tj79xcyebz.edgeone.app/download.jpg"
+        } else if (gender === "FEMALE") {
+            updatedData.imageUrl = "https://filthy-teal-skikp8ejez.edgeone.app/download.jpg"
+        }
+
+        const updatedDoctor = await prisma.doctor.update({
+            where: { id },
+            data: updatedData
+        })
+
+        return {
+            status: 200,
+            msg: "Doctor updated successfully",
+            doctor: updatedDoctor
+        }
+
+    } catch (error) {
+        console.log("Internal Server Error", error)
+
+        return {
+            status: 500,
+            msg: "Internal Server Error"
+        }
+    }
+}
+
 
 export const getAllDoctors = async () => {
     try {
+        const user = await requireAuth()
+
         const doctors = await prisma.doctor.findMany({
             orderBy: {
                 createdAt: "desc"
@@ -79,3 +131,39 @@ export const getAllDoctors = async () => {
         }
     }
 }
+
+export const getAvailableDoctors = async () => {
+    try {
+        const user = await requireAuth()
+
+        const doctors = await prisma.doctor.findMany({
+            orderBy: {
+                createdAt: "asc"
+            },
+            where: {
+                isActive: true
+            },
+            include: {
+                _count: {
+                    select: { appointments: true }
+                }
+            }
+        })
+
+
+        return {
+            status: 200,
+            msg: "Doctors fetched successfully",
+            doctors
+        }
+    } catch (error) {
+        console.log("Internal Server Error", error)
+
+        return {
+            status: 500,
+            msg: "Internal Server Error"
+        }
+    }
+}
+
+
