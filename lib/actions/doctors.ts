@@ -7,7 +7,6 @@ import { requireAuth } from "../middleware/auth"
 export const createDoctor = async (req: Request) => {
 
     try {
-
         const user = await requireAuth()
 
         const body = await req.json()
@@ -44,9 +43,14 @@ export const createDoctor = async (req: Request) => {
             msg: "Doctor created successfully",
             doctor: newDoctor
         }
-    } catch (error) {
+    } catch (error: any) {
         console.log("Internal Server Error", error)
-
+        if (error.message === "Unauthorized") {
+            return {
+                status: 401,
+                msg: "Unauthorized"
+            }
+        }
         return {
             status: 500,
             msg: "Internal Server Error"
@@ -54,12 +58,13 @@ export const createDoctor = async (req: Request) => {
     }
 }
 
-export const updateDoctor = async (req: Request, id: string) => {
+export const updateDoctor = async (req: Request) => {
     try {
         const user = await requireAuth()
 
         const body = await req.json()
         const {
+            id,
             name,
             email,
             bio,
@@ -68,6 +73,13 @@ export const updateDoctor = async (req: Request, id: string) => {
             gender,
             isActive
         } = body
+
+        if (!id) {
+            return {
+                status: 400,
+                msg: "Doctor ID is required"
+            }
+        }
 
         const updatedData: any = {}
 
@@ -96,9 +108,14 @@ export const updateDoctor = async (req: Request, id: string) => {
             doctor: updatedDoctor
         }
 
-    } catch (error) {
+    } catch (error: any) {
         console.log("Internal Server Error", error)
-
+        if (error.message === "Unauthorized") {
+            return {
+                status: 401,
+                msg: "Unauthorized"
+            }
+        }
         return {
             status: 500,
             msg: "Internal Server Error"
@@ -122,9 +139,14 @@ export const getAllDoctors = async () => {
             msg: "Doctors fetched successfully",
             doctors
         }
-    } catch (error) {
+    } catch (error: any) {
         console.log("Internal Server Error", error)
-
+        if (error.message === "Unauthorized") {
+            return {
+                status: 401,
+                msg: "Unauthorized"
+            }
+        }
         return {
             status: 500,
             msg: "Internal Server Error"
@@ -156,9 +178,14 @@ export const getAvailableDoctors = async () => {
             msg: "Doctors fetched successfully",
             doctors
         }
-    } catch (error) {
+    } catch (error: any) {
         console.log("Internal Server Error", error)
-
+        if (error.message === "Unauthorized") {
+            return {
+                status: 401,
+                msg: "Unauthorized"
+            }
+        }
         return {
             status: 500,
             msg: "Internal Server Error"
