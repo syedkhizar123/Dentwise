@@ -1,15 +1,31 @@
-import DashboardComp from "@/components/dashboard"
-import { currentUser } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
+"use client"
 
-const Dashboard = async () => {
-    const user = await currentUser()
-    if (!user) {
-        redirect("/")
-    }
-  
+import { useSyncUser } from "@/hooks/useSyncUser"
+import { useUser } from "@clerk/nextjs"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+
+const Dashboard = () => {
+
+    const { mutate } = useSyncUser()
+    const { isSignedIn, user, isLoaded } = useUser()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (isLoaded && !isSignedIn) {
+            router.replace("/")
+        }
+    }, [isLoaded, isSignedIn])
+
+    useEffect(() => {
+        if (user && isLoaded) {
+            mutate()
+        }
+    }, [user, isLoaded])
     return (
-       <DashboardComp />
+        <div>
+            Dashboard
+        </div>
     )
 }
 

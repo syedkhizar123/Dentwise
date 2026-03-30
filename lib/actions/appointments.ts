@@ -138,7 +138,7 @@ export const getBookedSlots = async (req: Request) => {
         const bookedSlots = await prisma.appointment.findMany({
             where: {
                 doctorId,
-                date : {
+                date: {
                     gte: start,
                     lte: end
                 }
@@ -166,5 +166,41 @@ export const getBookedSlots = async (req: Request) => {
     }
 }
 // Get Appointment Stats
-// Update Appointment
+
+export const getAppointmentStats = async () => {
+    try {
+
+        // const user = await requireAuth()
+
+        // These 2 will run in parallel
+        const [ total , completed  ] = await Promise.all([
+            prisma.appointment.count(),
+            prisma.appointment.count({
+                where: {
+                    status: "COMPLETED"
+                }
+            })
+        ])
+
+        return {
+            status: 200,
+            msg: "Appointment Stats fetched successfully",
+            total,
+            completed
+        }
+
+    } catch (error: any) {
+        console.log(error)
+        if (error.message === "Unauthorized") {
+            return {
+                status: 401,
+                msg: "Unauthorized"
+            }
+        }
+        return {
+            status: 500,
+            msg: "Internal Server Error"
+        }
+    }
+}
 
