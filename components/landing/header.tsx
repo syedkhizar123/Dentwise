@@ -10,7 +10,7 @@ export const Header = () => {
                 <p className="text-white text-md sm:text-xl max-[365px]:hidden">DentWise</p>
             </div>
 
-            <div className="hidden md:flex max-[820px]:gap-5 min-[820px]:gap-10 items-center">
+            <div className="hidden min-[800px]:flex max-[820px]:gap-5 min-[820px]:gap-10 items-center">
                 <a href="">
                     <p className="text-muted-foreground text-md">How it works</p>
                 </a>
@@ -33,7 +33,6 @@ export const Header = () => {
                         <p className="text-sm sm:text-base text-black">Sign Up</p>
                     </button>
                 </SignUpButton>
-                <Image src={"/menu.png"} alt="Menu Icon" height={30} width={30} className="block min-[800px]:hidden" />
 
             </div>
            
