@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/landing/header";
 import { Hero } from "@/components/landing/hero";
+import { HowItWorks } from "@/components/landing/howItWorks";
+import { WhatToAsk } from "@/components/landing/whatToAsk";
 
 
 export default function Home() {
@@ -19,6 +21,8 @@ export default function Home() {
     <>
       <Header />
       <Hero />
+      <HowItWorks />
+      <WhatToAsk />
     </>
 
   );
