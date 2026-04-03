@@ -11,13 +11,13 @@ export const Header = () => {
             </div>
 
             <div className="hidden min-[800px]:flex max-[820px]:gap-5 min-[820px]:gap-10 items-center">
-                <a href="">
+                <a href="#howitworks">
                     <p className="text-muted-foreground text-md">How it works</p>
                 </a>
-                <a href="">
+                <a href="#pricing">
                     <p className="text-muted-foreground text-md">Pricing</p>
                 </a>
-                <a href="">
+                <a href="#about">
                     <p className="text-muted-foreground text-md">About</p>
                 </a>
             </div>

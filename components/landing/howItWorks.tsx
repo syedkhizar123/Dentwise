@@ -3,7 +3,7 @@ import { ArrowRightIcon , ZapIcon } from "lucide-react"
 
 export const HowItWorks = () => {
     return (
-        <div className="flex flex-col gap-8 w-[90%] sm:w-[80%] mx-auto items-center justify-between pb-10 mb-10">
+        <div id="howitworks" className="flex flex-col gap-5 w-[90%] sm:w-[80%] mx-auto items-center justify-between pb-10 pt-5">
 
             <div className="flex items-center justify-between mx-auto border border-[#ffffff]/15 rounded-full px-4 py-2 gap-2 bg-white/5 backdrop-blur-sm shadow-lg bg-linear-to-r from-primary/10 to-primary/5 ">
                 <ZapIcon size={16} className="text-amber-500" />

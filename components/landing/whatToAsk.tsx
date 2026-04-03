@@ -3,7 +3,7 @@ import Image from "next/image"
 
 export const WhatToAsk = () => {
     return (
-        <div className="w-[95%] sm:w-[80%] mx-auto pb-10 flex flex-col gap-5 items-center justify-center">
+        <div id="about" className="w-[95%] sm:w-[80%] mx-auto pb-10 flex flex-col gap-5 items-center justify-center pt-10">
             <div className="flex items-center justify-between mx-auto border border-[#ffffff]/15 rounded-full px-4 py-2 gap-2 bg-white/5 backdrop-blur-sm shadow-lg bg-linear-to-r from-primary/10 to-primary/5 ">
                 <MessageCircle size={16} className="text-amber-500" />
                 <p className="text-xs text-amber-500">AI-Powered Conversations</p>

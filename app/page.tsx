@@ -6,6 +6,9 @@ import { Header } from "@/components/landing/header";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/howItWorks";
 import { WhatToAsk } from "@/components/landing/whatToAsk";
+import { Pricing } from "@/components/landing/pricing";
+import { CTA } from "@/components/landing/CTA";
+import { Footer } from "@/components/landing/footer";
 
 
 export default function Home() {
@@ -23,6 +26,9 @@ export default function Home() {
       <Hero />
       <HowItWorks />
       <WhatToAsk />
+      <Pricing />
+      <CTA />
+      <Footer />
     </>
 
   );

@@ -4,7 +4,7 @@ import Image from "next/image"
 export const Hero = () => {
     return (
 
-        <section className="relative h-screen flex items-start overflow-hidden pt-10">
+        <section className="relative flex lg:h-screen items-start overflow-hidden pt-10 pb-15 lg:pb-0">
             {/* DARK BASE */}
             <div className="absolute inset-0 bg-[#111111]">
                 {/* GRID */}
