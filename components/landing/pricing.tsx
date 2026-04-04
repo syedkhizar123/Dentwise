@@ -1,5 +1,7 @@
 import { CheckCircleIcon, ZapIcon } from "lucide-react"
 
+import { motion } from "framer-motion"
+
 export const Pricing = () => {
     return (
         <section id="pricing" className="relative flex items-start overflow-hidden my-10 py-5">
@@ -24,7 +26,7 @@ export const Pricing = () => {
                     <p className="text-center text-muted-foreground text-md">Our streamlined process makes dental care accessible, convenient, and stress free for everyone.</p>
                 </div>
 
-                <div className="flex flex-col min-[1100px]:flex-row gap-8 min-[1100px]:gap-3 justify-center items-start">
+                <div className="flex flex-col min-[1100px]:flex-row gap-8 min-[1100px]:gap-3 justify-center items-start mt-10">
                     <div className="p-8 min-[1100px]:w-[33%] max-w-85 rounded-3xl flex flex-col justify-start items-start gap-2 relative bg-linear-to-br from-card/90 to-card/60 backdrop-blur-xl border border-border/10 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">
                         <p className="text-white font-bold text-md text-start">Free</p>
                         <div className="flex justify-start items-center">

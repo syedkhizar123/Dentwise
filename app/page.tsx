@@ -15,6 +15,7 @@ export default function Home() {
 
   const { isSignedIn, isLoaded } = useUser()
   const router = useRouter()
+
   useEffect(() => {
     if (isLoaded && isSignedIn) {
       router.replace("/dashboard")

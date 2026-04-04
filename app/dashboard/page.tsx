@@ -1,5 +1,9 @@
 "use client"
 
+import { Actions } from "@/components/dashboard/Actions"
+import { Activity } from "@/components/dashboard/Activity"
+import { Header } from "@/components/dashboard/Header"
+import { Welcome } from "@/components/dashboard/Welcome"
 import { useSyncUser } from "@/hooks/useSyncUser"
 import { useUser } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
@@ -23,9 +27,12 @@ const Dashboard = () => {
         }
     }, [user, isLoaded])
     return (
-        <div>
-            Dashboard
-        </div>
+       <>
+        <Header name={user?.fullName || ""} email={user?.emailAddresses[0].emailAddress} />
+        <Welcome name={user?.firstName || ""} />
+        <Actions />
+        <Activity />
+       </>
     )
 }
 
