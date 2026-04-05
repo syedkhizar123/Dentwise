@@ -13,8 +13,8 @@ export const Pricing = () => {
 
             <div className="relative z-10 w-[90%] sm:w-[80%] mx-auto flex items-center justify-between flex-col gap-5">
                 <div className="flex items-center justify-between mx-auto border border-[#ffffff]/15 rounded-full px-4 py-2 gap-2 bg-white/5 backdrop-blur-sm shadow-lg bg-linear-to-r from-primary/10 to-primary/5 ">
-                    <ZapIcon size={16} className="text-amber-500" />
-                    <p className="text-xs text-amber-500">Simple Process</p>
+                        <div className="size-2 rounded-full bg-amber-500"></div>
+                    <p className="text-xs text-amber-500">Simple Pricing</p>
                 </div>
 
                 <div className="flex flex-col gap-1 mx-auto">

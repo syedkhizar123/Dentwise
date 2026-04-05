@@ -1,9 +1,10 @@
-import { Brain, MessageSquare } from "lucide-react"
+import { Brain, Calendar, Clock, MessageSquare, User } from "lucide-react"
+import Image from "next/image"
 
 
 export const Activity = () => {
     return (
-        <div className="w-[95%] sm:w-[80%] mx-auto py-10 flex flex-col md:flex-row justify-betweenitems-center ">
+        <div className="w-[95%] sm:w-[80%] mx-auto py-10 flex flex-col min-[860px]:flex-row justify-between items-start gap-5">
 
             <div className="p-6 flex flex-col gap-8 rounded-2xl border border-muted/10 ">
 
@@ -16,17 +17,17 @@ export const Activity = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                    <div className="rounded-lg w-70 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">3</p>
                         <p className="text-muted-foreground text-sm">Completed Visits</p>
                     </div>
 
-                     <div className="rounded-lg w-70 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">6</p>
                         <p className="text-muted-foreground text-sm">Total Appointments</p>
                     </div>
 
-                     <div className="rounded-lg w-70 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">Aug 2025</p>
                         <p className="text-muted-foreground text-sm">Member Since</p>
                     </div>
@@ -54,8 +55,58 @@ export const Activity = () => {
 
             </div>
 
-            <div>
-                
+            <div className="p-6 rounded-2xl border border-muted/10 flex flex-col gap-3 max-[860px]:w-full ">
+                <div className="flex gap-4 items-center">
+                    <Calendar size={20} className="text-primary" />
+                    <p className="text-muted text-sm font-semibold">Next Appointment</p>
+                </div>
+                <div className="flex justify-between items-center mt-5 mb-3">
+                    <div className="flex items-center justify-between border border-[#ffffff]/15 rounded-full px-4 py-2 gap-2 bg-white/5 backdrop-blur-sm shadow-lg bg-linear-to-r from-primary/10 to-primary/5 ">
+                        <div className="size-2 rounded-full bg-amber-500"></div>
+                        <p className="text-xs text-amber-500">Upcoming</p>
+                    </div>
+
+                    <div className="flex justify-center items-center px-4 py-2 bg-muted-foreground/10 rounded-md">
+                        <p className="text-sm text-muted">Confirmed</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+
+                    <div className="flex gap-3">
+                        <div className="flex justify-center items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm shadow-lg bg-linear-to-r from-primary/10 to-primary/5">
+                            <User size={20} className="text-amber-500" />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <p className="text-sm text-muted">Dr . John Smith</p>
+                            <p className="text-xs text-muted-foreground">Teeth Cleaning</p>
+                        </div>
+                    </div>
+
+                      <div className="flex gap-3">
+                        <div className="flex justify-center items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm shadow-lg bg-linear-to-r from-primary/10 to-primary/5">
+                            <Calendar size={20} className="text-amber-500" />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <p className="text-sm text-muted">Saturday, September 27, 2025</p>
+                            <p className="text-xs text-muted-foreground">Saturday</p>
+                        </div>
+                    </div>
+
+                      <div className="flex gap-3">
+                        <div className="flex justify-center items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm shadow-lg bg-linear-to-r from-primary/10 to-primary/5">
+                            <Clock size={20} className="text-amber-500" />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <p className="text-sm text-muted">09:00</p>
+                            <p className="text-xs text-muted-foreground">Local Time</p>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     )

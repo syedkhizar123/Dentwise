@@ -1,6 +1,7 @@
 import { UserButton } from "@clerk/nextjs"
 import { Calendar, Crown, Home, Menu, Mic } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 interface HeaderProps {
     name?: string
@@ -20,19 +21,19 @@ export const Header = ({ name, email }: HeaderProps) => {
                 <div className="hidden gap-4 items-center md:flex">
                     <div className="flex gap-2 items-center">
                         <Home size={20} className="text-muted-foreground" />
-                        <a className="text-muted-foreground text-sm" href="">Dashboard</a>
+                        <Link className="text-muted-foreground text-sm" href="dashboard">Dashboard</Link>
                     </div>
                     <div className="flex gap-2 items-center">
                         <Calendar size={20} className="text-muted-foreground" />
-                        <a className="text-muted-foreground text-sm" href="">Appointments</a>
+                        <Link className="text-muted-foreground text-sm" href="appointments">Appointments</Link>
                     </div>
                     <div className="flex gap-2 items-center">
                         <Mic size={20} className="text-muted-foreground" />
-                        <a className="text-muted-foreground text-sm" href="">Voice</a>
+                        <Link className="text-muted-foreground text-sm" href="voice">Voice</Link>
                     </div>
                     <div className="flex gap-2 items-center">
                         <Crown size={20} className="text-muted-foreground" />
-                        <a className="text-muted-foreground text-sm" href="">Pro</a>
+                        <Link className="text-muted-foreground text-sm" href="pro">Pro</Link>
                     </div>
                 </div>
             </div>
