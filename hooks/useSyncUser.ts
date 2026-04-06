@@ -9,12 +9,13 @@ export const useSyncUser = () => {
                 method: "POST"
             })
 
+            const data = await res.json()
+
             if (!res.ok) {
-                const data = await res.json()
                 throw new Error(data?.error || "Failed to sync")
             }
 
-            return res.json()
+            return data
         },
         onSuccess: (data) => {
             console.log("User synced", data)

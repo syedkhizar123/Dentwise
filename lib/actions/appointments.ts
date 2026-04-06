@@ -165,7 +165,6 @@ export const getBookedSlots = async (req: Request) => {
         }
     }
 }
-// Get Appointment Stats
 
 export const getAppointmentStats = async () => {
     try {
@@ -206,4 +205,41 @@ export const getAppointmentStats = async () => {
 
 // Get user's Appointment Stats
 
+export const getUserAppointmentStats = async () => {
+    try {
+        const user = await requireAuth()
+        const id = user.user.id
+
+        const [ total , completed  ] = await Promise.all([
+            prisma.appointment.count({
+                where: { userId: id }
+            }),
+            prisma.appointment.count({
+                where: {
+                    userId: id,
+                    status: "COMPLETED"
+                }
+            })
+        ])
+
+        return {
+            status: 200,
+            msg: "User Appointment Stats fetched successfully",
+            total,
+            completed
+        }
+    } catch (error: any) {
+        console.log(error)
+        if (error.message === "Unauthorized") {
+            return {
+                status: 401,
+                msg: "Unauthorized"
+            }
+        }
+        return {
+            status: 500,
+            msg: "Internal Server Error"
+        }
+    }
+}
 

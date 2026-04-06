@@ -1,8 +1,13 @@
 import { Brain, Calendar, Clock, MessageSquare, User } from "lucide-react"
-import Image from "next/image"
 
+interface ActivityProps {
+    total?: string
+    completed?: string
+    month?: string
+    year?: string
+}
 
-export const Activity = () => {
+export const Activity = ({ total , completed, month, year }: ActivityProps) => {
     return (
         <div className="w-[95%] sm:w-[80%] mx-auto py-10 flex flex-col min-[860px]:flex-row justify-between items-start gap-5">
 
@@ -18,17 +23,17 @@ export const Activity = () => {
 
                 <div className="flex flex-wrap gap-3">
                     <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
-                        <p className="text-2xl font-bold text-primary">3</p>
+                        <p className="text-2xl font-bold text-primary">{total}</p>
                         <p className="text-muted-foreground text-sm">Completed Visits</p>
                     </div>
 
                     <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
-                        <p className="text-2xl font-bold text-primary">6</p>
+                        <p className="text-2xl font-bold text-primary">{completed}</p>
                         <p className="text-muted-foreground text-sm">Total Appointments</p>
                     </div>
 
                     <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
-                        <p className="text-2xl font-bold text-primary">Aug 2025</p>
+                        <p className="text-2xl font-bold text-primary">{month} {year}</p>
                         <p className="text-muted-foreground text-sm">Member Since</p>
                     </div>
                 </div>

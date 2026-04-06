@@ -21,6 +21,14 @@ export default function Home() {
       router.replace("/dashboard")
     }
   }, [isLoaded, isSignedIn])
+
+  if (!isLoaded || isSignedIn) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+      </div>
+    )
+  }
+
   return (
     <>
       <Header />

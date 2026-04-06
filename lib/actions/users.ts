@@ -27,7 +27,7 @@ export const syncUser = async () => {
             },
         })
 
-        return NextResponse.json({ msg: "User created in DB", newUser }, { status: 201 })
+        return NextResponse.json({ msg: "User created in DB", user: newUser }, { status: 201 })
     } catch (error) {
         console.log(error)
 
