@@ -19,7 +19,7 @@ const Voice = () => {
     }, [isLoaded, isSignedIn])
   return (
     <>
-        <Header />
+        <Header name={user?.fullName || ""} email={user?.emailAddresses[0].emailAddress} />
         <Hero />
         <FeatureCards />
         <Call name={user?.fullName || "User"} image={user?.imageUrl || ""} />

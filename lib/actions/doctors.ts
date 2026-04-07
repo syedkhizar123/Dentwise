@@ -131,6 +131,9 @@ export const getAllDoctors = async () => {
         const doctors = await prisma.doctor.findMany({
             orderBy: {
                 createdAt: "desc"
+            },
+            include: {
+                appointments: true
             }
         })
 

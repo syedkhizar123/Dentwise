@@ -45,4 +45,3 @@ export const Call = ({ image, name }: CallProps) => {
         </div>
     )
 }
-
