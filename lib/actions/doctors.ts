@@ -92,9 +92,9 @@ export const updateDoctor = async (req: Request) => {
         if (isActive !== undefined) updatedData.isActive = isActive
 
         if (gender === "MALE") {
-            updatedData.imageUrl = "https://xerothermic-black-tj79xcyebz.edgeone.app/download.jpg"
+            updatedData.imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNsrCyLyQ8U6WyTBm3KvE9AtbY8SPxtL2M_Q&s"
         } else if (gender === "FEMALE") {
-            updatedData.imageUrl = "https://filthy-teal-skikp8ejez.edgeone.app/download.jpg"
+            updatedData.imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV6O28cLfZm4fQ9X3SrLvYc8xAYfH70Lfx8Q&s"
         }
 
         const updatedDoctor = await prisma.doctor.update({

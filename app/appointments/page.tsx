@@ -12,6 +12,7 @@ const Appointments = () => {
     const { isSignedIn, user, isLoaded } = useUser()
     const router = useRouter()
     const [activeStep, setActiveStep] = useState(1)
+    const [selectedDoctor, setSelectedDoctor] = useState()
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
@@ -33,9 +34,13 @@ const Appointments = () => {
                 <div>
                     <DoctorInfo />
                     <div className="w-[95%] sm:w-[80%] mx-auto my-5">
-                        <button onClick={() => { setActiveStep(2) }} className="bg-primary text-muted py-1 px-5 rounded-sm">
-                            Next
-                        </button>
+                        {
+                            selectedDoctor && (
+                                <button onClick={() => { setActiveStep(2) }} className="bg-primary text-muted py-1 px-5 rounded-sm">
+                                    Next
+                                </button>
+                            )
+                        }
                     </div>
                 </div>
             )}

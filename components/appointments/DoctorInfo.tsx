@@ -1,11 +1,12 @@
 "use client"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { getDoctors } from "@/hooks/useDoctors"
 import {  MapPinIcon, Phone } from "lucide-react"
 
-export const DoctorInfo = () => {
+export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctorId: string | null) => void }) => {
 
     const { data, isLoading, isError } = getDoctors()
+    const [ selectedDoctor , setSelectedDoctor] = useState(null)
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-screen">
@@ -21,8 +22,19 @@ export const DoctorInfo = () => {
             </div>
         )
     }
-    console.log(data.doctors[0].imageUrl)
-    console.log(data.doctors)
+
+    //  const handleSelect = (doctorId: string) => {
+    //     const newSelection = selectedDoctor === doctorId ? null : doctorId
+    //     setSelectedDoctor(newSelection)
+    //     onSelectDoctor?.(newSelection) // <-- notify parent
+    // }
+
+
+    useEffect(() => {
+        console.log(selectedDoctor)
+    } , [selectedDoctor])
+    // console.log(data.doctors[0].imageUrl)
+    // console.log(data.doctors)
 
     return (
         <>
@@ -32,78 +44,12 @@ export const DoctorInfo = () => {
                     data.doctors.map((doctor: any, index: any) => {
                         return (
                             <React.Fragment key={doctor.id}>
-                                <div  className="border border-muted/20 rounded-lg p-5 flex flex-col gap-5 max-w-100 mx-auto sm:mx-0 w-full sm:w-[48%] lg:w-[31%]">
+                                 <div onClick={() => { selectedDoctor === doctor.id ? setSelectedDoctor(null) : setSelectedDoctor(doctor.id); onSelectDoctor?.(selectedDoctor)  }}  className={`border rounded-lg px-5 py-8 flex flex-col gap-5 max-w-100 mx-auto sm:mx-0 w-full sm:w-[48%] lg:w-[31%] cursor-pointer ${selectedDoctor === doctor.id ? "border-primary" : "border-muted/20"}`}>
                                     <div className="flex gap-3">
                                         <img
                                             src={doctor.imageUrl}
                                             alt="Doctor Image"
-                                            referrerPolicy="no-referrer"
-                                            crossOrigin="anonymous"
-                                            className="w-25 h-25 rounded-full object-cover"
-                                        />
-                                        <div className="flex flex-col gap-1">
-                                            <p className="text-muted text-lg font-bold">Dr. {doctor.name}</p>
-                                            <p className="text-sm text-primary font-semibold">{doctor.speciality}</p>
-                                            <p className="text-muted-foreground text-sm">({doctor.appointments.length}) appointments</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-2 items-center">
-                                        <MapPinIcon className="text-muted-foreground" size={20} />
-                                        <p className="text-muted-foreground text-sm">Dental Centre</p>
-                                    </div>
-
-                                    <div className="flex gap-2 items-center">
-                                        <Phone className="text-muted-foreground" size={20} />
-                                        <p className="text-muted-foreground text-sm">{doctor.phone}</p>
-                                    </div>
-
-                                    <p className="text-muted-foreground text-sm">{doctor.bio}</p>
-
-                                    <div className="rounded-full px-4 py-1 bg-blue-300/40 w-max">
-                                        <p className="text-sm text-black">Licensed Professional</p>
-                                    </div>
-
-
-                                </div>
-                                 <div  className="border border-muted/20 rounded-lg p-5 flex flex-col gap-5 max-w-100 mx-auto sm:mx-0 w-full sm:w-[48%] lg:w-[31%]">
-                                    <div className="flex gap-3">
-                                        <img
-                                            src={doctor.imageUrl}
-                                            alt="Doctor Image"
-                                            className="w-25 h-25 rounded-full object-cover"
-                                        />
-                                        <div className="flex flex-col gap-1">
-                                            <p className="text-muted text-lg font-bold">Dr. {doctor.name}</p>
-                                            <p className="text-sm text-primary font-semibold">{doctor.speciality}</p>
-                                            <p className="text-muted-foreground text-sm">({doctor.appointments.length}) appointments</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-2 items-center">
-                                        <MapPinIcon className="text-muted-foreground" size={20} />
-                                        <p className="text-muted-foreground text-sm">Dental Centre</p>
-                                    </div>
-
-                                    <div className="flex gap-2 items-center">
-                                        <Phone className="text-muted-foreground" size={20} />
-                                        <p className="text-muted-foreground text-sm">{doctor.phone}</p>
-                                    </div>
-
-                                    <p className="text-muted-foreground text-sm">{doctor.bio}</p>
-
-                                    <div className="rounded-full px-4 py-1 bg-blue-300/40 w-max">
-                                        <p className="text-sm text-black">Licensed Professional</p>
-                                    </div>
-
-
-                                </div>
-                                 <div  className="border border-muted/20 rounded-lg p-5 flex flex-col gap-5 max-w-100 mx-auto sm:mx-0 w-full sm:w-[48%] lg:w-[31%]">
-                                    <div className="flex gap-3">
-                                        <img
-                                            src={doctor.imageUrl}
-                                            alt="Doctor Image"
-                                            className="w-25 h-25 rounded-full object-cover"
+                                            className="w-20 h-20 rounded-full object-cover"
                                         />
                                         <div className="flex flex-col gap-1">
                                             <p className="text-muted text-lg font-bold">Dr. {doctor.name}</p>
