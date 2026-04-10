@@ -1,12 +1,22 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { getDoctors } from "@/hooks/useDoctors"
-import {  MapPinIcon, Phone } from "lucide-react"
+import { MapPinIcon, Phone } from "lucide-react"
 
-export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctorId: string | null) => void }) => {
+interface selectedDoctor {
+    id: string,
+    name: string
+}
+
+export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctor: selectedDoctor | null) => void }) => {
 
     const { data, isLoading, isError } = getDoctors()
-    const [ selectedDoctor , setSelectedDoctor] = useState(null)
+    const [selectedDoctor, setSelectedDoctor] = useState(null)
+
+    useEffect(() => {
+        console.log(selectedDoctor)
+    }, [selectedDoctor])
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-screen">
@@ -23,19 +33,6 @@ export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctorId: str
         )
     }
 
-    //  const handleSelect = (doctorId: string) => {
-    //     const newSelection = selectedDoctor === doctorId ? null : doctorId
-    //     setSelectedDoctor(newSelection)
-    //     onSelectDoctor?.(newSelection) // <-- notify parent
-    // }
-
-
-    useEffect(() => {
-        console.log(selectedDoctor)
-    } , [selectedDoctor])
-    // console.log(data.doctors[0].imageUrl)
-    // console.log(data.doctors)
-
     return (
         <>
             <p className="w-[95%] sm:w-[80%] mx-auto text-center sm:text-start text-2xl font-bold text-muted/80 my-5">Choose Your Dentist</p>
@@ -44,7 +41,11 @@ export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctorId: str
                     data.doctors.map((doctor: any, index: any) => {
                         return (
                             <React.Fragment key={doctor.id}>
-                                 <div onClick={() => { selectedDoctor === doctor.id ? setSelectedDoctor(null) : setSelectedDoctor(doctor.id); onSelectDoctor?.(selectedDoctor)  }}  className={`border rounded-lg px-5 py-8 flex flex-col gap-5 max-w-100 mx-auto sm:mx-0 w-full sm:w-[48%] lg:w-[31%] cursor-pointer ${selectedDoctor === doctor.id ? "border-primary" : "border-muted/20"}`}>
+                                <div onClick={() => {
+                                    const newValue = selectedDoctor === doctor.id ? null : doctor.id
+                                    setSelectedDoctor(newValue)
+                                    onSelectDoctor?.({id: doctor.id , name: doctor.name})
+                                }} className={`border rounded-lg px-5 py-8 flex flex-col gap-5 max-w-100 mx-auto sm:mx-0 w-full sm:w-[48%] lg:w-[31%] cursor-pointer ${selectedDoctor === doctor.id ? "border-primary" : "border-muted/20"}`}>
                                     <div className="flex gap-3">
                                         <img
                                             src={doctor.imageUrl}
@@ -76,7 +77,7 @@ export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctorId: str
 
 
                                 </div>
-                                
+
                             </React.Fragment>
                         )
                     })
