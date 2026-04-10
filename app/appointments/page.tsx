@@ -4,7 +4,7 @@ import { DoctorInfo } from "@/components/appointments/DoctorInfo"
 import { ProgressSteps } from "@/components/appointments/ProgressSteps"
 import { Header } from "@/components/dashboard/Header"
 import { useUser } from "@clerk/nextjs"
-import { ChevronLeftIcon } from "lucide-react"
+import { ChevronLeftIcon, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -38,10 +38,42 @@ const Appointments = () => {
         }
 
     ]
+    const dates = [
+        {
+            day: "Sun",
+            date: "Apr 11"
+        },
+        {
+            day: "Mon",
+            date: "Apr 12"
+        },
+        {
+            day: "Tue",
+            date: "Apr 13"
+        },
+        {
+            day: "Wed",
+            date: "Apr 14"
+        },
+        {
+            day: "Thu",
+            date: "Apr 15"
+        },
+        {
+            day: "Fri",
+            date: "Apr 16"
+        },
+        {
+            day: "Sat",
+            date: "Apr 17"
+        }
+    ]
     const { isSignedIn, user, isLoaded } = useUser()
     const router = useRouter()
     const [activeStep, setActiveStep] = useState(1)
     const [selectedDoctor, setSelectedDoctor] = useState<selectedDoctor | null>(null)
+    const [selectedType, setSelectedType] = useState<string | null>(null)
+    const [selectedDate , setSelectedDate] = useState<string | null>(null) 
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
@@ -49,8 +81,9 @@ const Appointments = () => {
         }
     }, [isLoaded, isSignedIn])
 
-    console.log(selectedDoctor)
-
+    useEffect(() => {
+        console.log("Selected Date:- " , selectedDate)
+    } , [selectedDate])
 
     return (
         <>
@@ -91,14 +124,14 @@ const Appointments = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-col lg:flex-row gap-2 justify-between my-5">
+                    <div className="flex flex-col lg:flex-row gap-5 justify-between my-5">
                         <div className="flex flex-col gap-3 w-full lg:w-[50%]">
                             <p className="text-muted text-lg">Appointment Type</p>
 
                             {
                                 appointmentTypes.map((item) => (
-                                    <div key={item.type} className="w-full border border-muted/15 rounded-xl py-10 px-5">
-                                        <div className="flex justify-between w-full items-center">
+                                    <div onClick={() => {selectedType === item.type ? setSelectedType(null) : setSelectedType(item.type)}} key={item.type} className={`w-full border rounded-xl py-10 px-5 ${selectedType === item.type ? "border-2 border-primary" : "border-muted/15"}`}>
+                                        <div className='flex justify-between w-full items-center'>
                                             <div className="flex flex-col">
                                                 <p className="text-muted ">{item.type}</p>
                                                 <p className="text-muted-foreground text-sm">{item.time} min</p>
@@ -112,6 +145,29 @@ const Appointments = () => {
                             }
 
 
+
+                        </div>
+
+                        <div className="flex flex-col gap-3 w-full lg:w-[50%]">
+
+                            <p className="text-muted text-lg">Available Dates</p>
+
+                            <div className="flex flex-wrap gap-3">
+                                {
+                                    dates.map((item) => (
+                                        <div onClick={() => {
+                                            const newDate = selectedDate === `${item.day}, ${item.date}` ? null :`${item.day}, ${item.date}`
+                                            setSelectedDate(newDate)
+                                        }} key={item.date} className={`w-full sm:w-[48%] border rounded-md py-3 ${selectedDate === `${item.day}, ${item.date}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}` }>
+                                            <p className={`text-center ${selectedDate === `${item.day}, ${item.date}` ? "text-black" : "text-muted"}`}>
+                                                {item.day}, {item.date}
+                                            </p>
+                                        </div>
+                                    ))
+                                }
+
+
+                            </div>
 
                         </div>
                     </div>
