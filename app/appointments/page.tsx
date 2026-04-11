@@ -7,10 +7,13 @@ import { useUser } from "@clerk/nextjs"
 import { ChevronLeftIcon, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 
 interface selectedDoctor {
     id: string,
-    name: string
+    name: string,
+    img: string,
+    speciality: string
 }
 
 const Appointments = () => {
@@ -68,12 +71,34 @@ const Appointments = () => {
             date: "Apr 17"
         }
     ]
+    const times = ["9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"]
+
+    const handleSecondStep = () => {
+        if (selectedType) {
+            if (selectedDate) {
+                if (selectedTime) {
+                    setActiveStep(3)
+                } else {
+                    toast.error("Select time")
+                }
+            } else {
+                toast.error("Select Date")
+            }
+        } else {
+            toast.error("Select type");
+
+        }
+    }
+
     const { isSignedIn, user, isLoaded } = useUser()
     const router = useRouter()
     const [activeStep, setActiveStep] = useState(1)
     const [selectedDoctor, setSelectedDoctor] = useState<selectedDoctor | null>(null)
     const [selectedType, setSelectedType] = useState<string | null>(null)
-    const [selectedDate , setSelectedDate] = useState<string | null>(null) 
+    const [selectedDate, setSelectedDate] = useState<string | null>(null)
+    const [selectedTime, setSelectedTime] = useState<string | null>(null)
+    const [duration, setDuration] = useState<number | null>(null)
+    const [price, setPrice] = useState<number | null>(null)
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
@@ -82,8 +107,17 @@ const Appointments = () => {
     }, [isLoaded, isSignedIn])
 
     useEffect(() => {
-        console.log("Selected Date:- " , selectedDate)
-    } , [selectedDate])
+        console.log("Selected Time:- ", selectedTime)
+    }, [selectedTime])
+
+    useEffect(() => {
+        console.log("Selected Type:- ", selectedType)
+        if (selectedType) {
+            const appointment = appointmentTypes.find((app) => app.type === selectedType)
+            setDuration(appointment!.time)
+            setPrice(appointment!.price)
+        }
+    }, [selectedType])
 
     return (
         <>
@@ -112,7 +146,7 @@ const Appointments = () => {
 
             {(activeStep === 2 && selectedDoctor) && (
                 <div className="w-[95%] sm:w-[80%] mx-auto my-5 flex flex-col">
-                    <div className="flex gap-3 my-2">
+                    <div className="flex max-[400px]:flex-col gap-3 my-2">
                         <button onClick={() => { setActiveStep(1) }} className=" text-muted px-4 py-2 flex gap-2 items-center">
                             <ChevronLeftIcon size={15} className="text-muted-foreground" />
                             <p className="text-muted-foreground text-sm">Back</p>
@@ -130,7 +164,7 @@ const Appointments = () => {
 
                             {
                                 appointmentTypes.map((item) => (
-                                    <div onClick={() => {selectedType === item.type ? setSelectedType(null) : setSelectedType(item.type)}} key={item.type} className={`w-full border rounded-xl py-10 px-5 ${selectedType === item.type ? "border-2 border-primary" : "border-muted/15"}`}>
+                                    <div onClick={() => { selectedType === item.type ? setSelectedType(null) : setSelectedType(item.type) }} key={item.type} className={`w-full border rounded-xl py-10 px-5 cursor-pointer ${selectedType === item.type ? "border-2 border-primary" : "border-muted/15"}`}>
                                         <div className='flex justify-between w-full items-center'>
                                             <div className="flex flex-col">
                                                 <p className="text-muted ">{item.type}</p>
@@ -144,8 +178,6 @@ const Appointments = () => {
                                 ))
                             }
 
-
-
                         </div>
 
                         <div className="flex flex-col gap-3 w-full lg:w-[50%]">
@@ -156,24 +188,41 @@ const Appointments = () => {
                                 {
                                     dates.map((item) => (
                                         <div onClick={() => {
-                                            const newDate = selectedDate === `${item.day}, ${item.date}` ? null :`${item.day}, ${item.date}`
+                                            const newDate = selectedDate === `${item.day}, ${item.date}` ? null : `${item.day}, ${item.date}`
                                             setSelectedDate(newDate)
-                                        }} key={item.date} className={`w-full sm:w-[48%] border rounded-md py-3 ${selectedDate === `${item.day}, ${item.date}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}` }>
+                                        }} key={item.date} className={`w-full sm:w-[48%] border rounded-md py-3 cursor-pointer ${selectedDate === `${item.day}, ${item.date}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}`}>
                                             <p className={`text-center ${selectedDate === `${item.day}, ${item.date}` ? "text-black" : "text-muted"}`}>
                                                 {item.day}, {item.date}
                                             </p>
                                         </div>
                                     ))
                                 }
+                            </div>
 
+                            <p className="text-muted text-lg mt-4">Available Times</p>
 
+                            <div className="flex flex-wrap gap-3">
+                                {
+                                    times.map((item) => (
+                                        <div onClick={() => {
+                                            const newTime = selectedTime === `${item}` ? null : `${item}`
+                                            setSelectedTime(newTime)
+                                        }} key={item} className={`w-full sm:w-[48%] md:w-[31%] border rounded-md py-1.5 cursor-pointer ${selectedTime === `${item}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}`}>
+                                            <p className={`text-center flex items-center justify-center gap-2 ${selectedTime === `${item}` ? "text-black" : "text-muted"}`}>
+                                                <Clock size={16} className={`${selectedTime === item ? "text-black" : "text-muted"}`} />
+                                                {item}
+                                            </p>
+                                        </div>
+                                    ))
+                                }
                             </div>
 
                         </div>
                     </div>
                     <div className="self-end flex gap-3">
-                        <button onClick={() => { setActiveStep(3) }} className="bg-primary text-muted py-2 px-5 rounded-lg">
-                            Next
+                        <button onClick={() => { handleSecondStep() }}
+                            className="bg-primary text-muted py-2 px-5 rounded-lg">
+                            Review Booking
                         </button>
                         <button onClick={() => { setActiveStep(1) }} className="bg-primary text-muted py-2 px-5 rounded-lg">
                             Back
@@ -182,12 +231,105 @@ const Appointments = () => {
                 </div>
             )}
 
-            {activeStep === 3 && (
-                <div>
-                    <p className="text-muted">This is Step 3</p>
-                    <button onClick={() => { setActiveStep(2) }} className="bg-primary text-muted py-2 px-5 rounded-lg">
-                        Back
-                    </button>
+            {(activeStep === 3 && selectedType && selectedDate && selectedTime) && (
+                <div className="w-[95%] sm:w-[80%] mx-auto my-5 flex flex-col">
+                    <div className="flex max-[400px]:flex-col gap-3 my-2 items-center">
+                        <button onClick={() => { setActiveStep(2) }} className=" text-muted px-4 py-2 flex gap-2 items-center">
+                            <ChevronLeftIcon size={15} className="text-muted-foreground" />
+                            <p className="text-muted-foreground text-sm">Back</p>
+                        </button>
+
+                        <p className="text-muted text-xl font-bold">Confrim Your Appointment</p>
+                    </div>
+
+                    <div className="border border-muted/15 rounded-xl flex flex-col gap-3 py-10 px-5 max-w-120 ">
+                        <p className="text-muted">Appointment Summary</p>
+
+                        <div className="flex items-center gap-3 border-b border-muted/15 pb-4">
+                            <img
+                                src={selectedDoctor?.img}
+                                className="w-16 h-16 rounded-full object-cover"
+                                alt="Doctor Image"
+                            />
+                            <div className="flex flex-col gap-1 ">
+                                <p className="text-muted text-sm">Dr. {selectedDoctor?.name}</p>
+                                <p className="text-muted-foreground text-sm">{selectedDoctor?.speciality}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-15 mt-3">
+                            <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-sm text-muted-foreground">Appointment Type</p>
+                                    <p className="text-muted">{selectedType}</p>
+                                </div>
+
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-sm text-muted-foreground">Date</p>
+                                    <p className="text-muted">{selectedDate}</p>
+                                </div>
+
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-sm text-muted-foreground">Location</p>
+                                    <p className="text-muted">Dental Centre</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-sm text-muted-foreground">Duration</p>
+                                    <p className="text-muted">{duration} min</p>
+                                </div>
+
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-sm text-muted-foreground">Time</p>
+                                    <p className="text-muted">{selectedTime}</p>
+                                </div>
+
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-sm text-muted-foreground">Cost</p>
+                                    <p className="text-primary font-semibold">${price}</p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        {/* <div className="flex gap-10">
+                            <div className="flex flex-col gap-1">
+                                <p className="text-sm text-muted-foreground">Appointmnet Type</p>
+                                <p className="text-muted">{selectedType}</p>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                 <p className="text-sm text-muted-foreground">Duration</p>
+                                <p className="text-muted">30 min</p>
+                            </div>
+                        </div>
+
+                         <div className="flex gap-10">
+                            <div className="flex flex-col gap-1">
+                                <p className="text-sm text-muted-foreground">Date</p>
+                                <p className="text-muted">{selectedDate}</p>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                 <p className="text-sm text-muted-foreground">Time</p>
+                                <p className="text-muted">{selectedTime}</p>
+                            </div>
+                        </div>
+
+                         <div className="flex gap-10">
+                            <div className="flex flex-col gap-1">
+                                <p className="text-sm text-muted-foreground">Location</p>
+                                <p className="text-muted">Dental Centre</p>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                 <p className="text-sm text-muted-foreground">Cost</p>
+                                <p className="text-primary font-semibold">$75</p>
+                            </div>
+                        </div> */}
+                    </div>
                 </div>
             )}
 
