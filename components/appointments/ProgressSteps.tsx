@@ -9,7 +9,7 @@ export const ProgressSteps = ({ activeStep }: progressProps) => {
     const steps = ["Select Dentist", "Choose Time", "Confirm"]
 
     return (
-        <div className="w-max sm:w-[80%] max-w-[95%] mx-auto flex flex-wrap gap-2 sm:gap-5 my-3">
+        <div className="w-[95%] sm:w-[80%]  mx-auto flex flex-wrap gap-2 sm:gap-5 my-3">
             {steps.map((item, index) => {
                 const currentStep = index + 1
                 return (

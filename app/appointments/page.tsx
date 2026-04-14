@@ -123,8 +123,8 @@ const Appointments = () => {
         <>
             <Header name={user?.fullName || ""} email={user?.emailAddresses[0].emailAddress} />
             <div className="w-[95%] sm:w-[80%] mx-auto my-5">
-                <p className="text-muted text-2xl sm:text-3xl font-bold text-center sm:text-start">Book an Appointment</p>
-                <p className="text-muted-foreground mt-3 text-sm sm:text-base text-center sm:text-start">Find and book with verified dentists in your area</p>
+                <p className="text-muted text-2xl sm:text-3xl font-bold text-start">Book an Appointment</p>
+                <p className="text-muted-foreground mt-3 text-sm sm:text-base text-start">Find and book with verified dentists in your area</p>
             </div>
             <ProgressSteps activeStep={activeStep} />
 
@@ -146,8 +146,8 @@ const Appointments = () => {
 
             {(activeStep === 2 && selectedDoctor) && (
                 <div className="w-[95%] sm:w-[80%] mx-auto my-5 flex flex-col">
-                    <div className="flex max-[400px]:flex-col gap-3 my-2">
-                        <button onClick={() => { setActiveStep(1) }} className=" text-muted px-4 py-2 flex gap-2 items-center">
+                    <div className="flex max-[410px]:flex-col gap-5 my-4 min-[410px]:items-center">
+                        <button onClick={() => { setActiveStep(1) }} className="border border-muted/15 rounded-lg text-muted px-4 py-2 flex gap-1 items-center w-max h-max">
                             <ChevronLeftIcon size={15} className="text-muted-foreground" />
                             <p className="text-muted-foreground text-sm">Back</p>
                         </button>
@@ -221,10 +221,10 @@ const Appointments = () => {
                     </div>
                     <div className="self-end flex gap-3">
                         <button onClick={() => { handleSecondStep() }}
-                            className="bg-primary text-muted py-2 px-5 rounded-lg">
+                            className="bg-primary text-black py-2 px-5 rounded-sm text-sm">
                             Review Booking
                         </button>
-                        <button onClick={() => { setActiveStep(1) }} className="bg-primary text-muted py-2 px-5 rounded-lg">
+                        <button onClick={() => { setActiveStep(1) }} className="bg-muted-foreground/15 text-muted py-2 px-5 rounded-sm text-sm">
                             Back
                         </button>
                     </div>
@@ -232,9 +232,9 @@ const Appointments = () => {
             )}
 
             {(activeStep === 3 && selectedType && selectedDate && selectedTime) && (
-                <div className="w-[95%] sm:w-[80%] mx-auto my-5 flex flex-col">
-                    <div className="flex max-[400px]:flex-col gap-3 my-2 items-center">
-                        <button onClick={() => { setActiveStep(2) }} className=" text-muted px-4 py-2 flex gap-2 items-center">
+                <div className="w-[95%] sm:w-[80%] mx-auto my-5 flex flex-col ">
+                    <div className="flex max-[410px]:flex-col max-[410px]:items-start gap-3 my-4 items-center">
+                        <button onClick={() => { setActiveStep(2) }} className="border border-muted/15 rounded-lg text-muted px-4 py-2 flex gap-1 items-center">
                             <ChevronLeftIcon size={15} className="text-muted-foreground" />
                             <p className="text-muted-foreground text-sm">Back</p>
                         </button>
@@ -242,7 +242,7 @@ const Appointments = () => {
                         <p className="text-muted text-xl font-bold">Confrim Your Appointment</p>
                     </div>
 
-                    <div className="border border-muted/15 rounded-xl flex flex-col gap-3 py-10 px-5 max-w-120 ">
+                    <div className="border border-muted/15 rounded-xl flex flex-col gap-3 py-10 px-5 w-full sm:w-120 ">
                         <p className="text-muted">Appointment Summary</p>
 
                         <div className="flex items-center gap-3 border-b border-muted/15 pb-4">
@@ -329,6 +329,16 @@ const Appointments = () => {
                                 <p className="text-primary font-semibold">$75</p>
                             </div>
                         </div> */}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-5 my-5">
+                        <button onClick={() => { setActiveStep(2)}} className="bg-muted-foreground/10 rounded-sm px-5 py-3 ">
+                            <p className="text-muted text-sm">Modify Appointment</p>
+                        </button>
+
+                         <button className="bg-primary rounded-sm px-5 py-3 ">
+                            <p className="text-black text-sm">Confirm Booking</p>
+                        </button>
                     </div>
                 </div>
             )}
