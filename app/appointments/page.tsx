@@ -3,6 +3,7 @@
 import { DoctorInfo } from "@/components/appointments/DoctorInfo"
 import { ProgressSteps } from "@/components/appointments/ProgressSteps"
 import { Header } from "@/components/dashboard/Header"
+import { usePayment } from "@/hooks/usePayment"
 import { useUser } from "@clerk/nextjs"
 import { ChevronLeftIcon, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -91,6 +92,7 @@ const Appointments = () => {
     }
 
     const { isSignedIn, user, isLoaded } = useUser()
+    const { mutate: startPayment , isPending} = usePayment()
     const router = useRouter()
     const [activeStep, setActiveStep] = useState(1)
     const [selectedDoctor, setSelectedDoctor] = useState<selectedDoctor | null>(null)
@@ -332,12 +334,19 @@ const Appointments = () => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-5 my-5">
-                        <button onClick={() => { setActiveStep(2)}} className="bg-muted-foreground/10 rounded-sm px-5 py-3 ">
+                        <button onClick={() => { setActiveStep(2) }} className="bg-muted-foreground/10 rounded-sm px-5 py-3 ">
                             <p className="text-muted text-sm">Modify Appointment</p>
                         </button>
 
-                         <button className="bg-primary rounded-sm px-5 py-3 ">
-                            <p className="text-black text-sm">Confirm Booking</p>
+                        <button disabled={isPending} onClick={() => {
+                            startPayment({
+                                doctorId: selectedDoctor?.id || null,
+                                date: selectedDate,
+                                time: selectedTime,
+                                amount: price
+                            })
+                        }} className={`rounded-sm px-5 py-3 ${isPending ? "bg-muted-foreground cursor-not-allowed" : "bg-primary"}`}>
+                            <p className={`text-sm ${isPending ? "text-muted" : "text-black"}`}>{ isPending ? "Processing..." : "Confirm Booking"}</p>
                         </button>
                     </div>
                 </div>
