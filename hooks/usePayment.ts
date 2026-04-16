@@ -40,7 +40,7 @@ export const usePayment = () => {
 
         onSuccess: (data) => {
             if (data?.url) {
-                window.location.href = data.url // redirect to Stripe
+                window.location.href = data.url 
             }
         },
 

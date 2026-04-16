@@ -37,7 +37,7 @@ export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctor: selec
 
     return (
         <>
-            <p className="w-[95%] sm:w-[80%] mx-auto text-center sm:text-start text-2xl font-bold text-muted/80 my-5">Choose Your Dentist</p>
+            <p className="w-[95%] sm:w-[80%] mx-auto text-2xl font-bold text-muted/80 my-5">Choose Your Dentist</p>
             <div className="w-[95%] sm:w-[80%] flex flex-wrap mx-auto gap-2">
                 {
                     data.doctors.map((doctor: any, index: any) => {
@@ -47,7 +47,7 @@ export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctor: selec
                                     const newValue = selectedDoctor === doctor.id ? null : doctor.id
                                     setSelectedDoctor(newValue)
                                     onSelectDoctor?.( newValue ? {id: doctor.id , name: doctor.name, img: doctor.imageUrl, speciality: doctor.speciality} : null)
-                                }} className={`border rounded-lg px-5 py-8 flex flex-col gap-5 max-w-100 mx-auto sm:mx-0 w-full sm:w-[48%] lg:w-[31%] cursor-pointer ${selectedDoctor === doctor.id ? "border-primary" : "border-muted/20"}`}>
+                                }} className={`border rounded-lg px-5 py-8 flex flex-col gap-5 max-w-130 mx-0 sm:mx-0 w-full sm:w-[48%] lg:w-[31%] cursor-pointer ${selectedDoctor === doctor.id ? "border-primary" : "border-muted/20"}`}>
                                     <div className="flex gap-3">
                                         <img
                                             src={doctor.imageUrl}
@@ -88,4 +88,3 @@ export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctor: selec
         </>
     )
 }
-
