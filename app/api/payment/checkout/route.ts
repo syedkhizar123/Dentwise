@@ -7,9 +7,21 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json()
 
-        const { doctorId, date, time, amount } = body
+        const { doctorId, userId, date, time, duration, notes, reason, amount } = body
+        console.log("CHECKOUT BODY:", body)
+        console.log("METADATA SENT:", {
+            doctorId,
+            userId,
+            date,
+            time,
+            duration,
+        })
 
-        const session = stripe.checkout.sessions.create({
+        if (!userId || !doctorId || !date || !time || !amount) {
+            throw new Error("Missing required checkout fields")
+        }
+
+        const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
@@ -27,9 +39,13 @@ export async function POST(req: NextRequest) {
                 }
             ],
             metadata: {
-                doctorId,
-                date,
-                time
+                userId: String(userId),
+                doctorId: String(doctorId),
+                date: String(date),
+                time: String(time),
+                duration: String(duration),
+                notes: String(notes ?? ""),
+                reason: String(reason ?? ""),
             }
         })
 

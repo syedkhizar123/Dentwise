@@ -106,10 +106,16 @@ export const getUserAppointments = async () => {
             where: { userId: id }
         })
 
+        const upcoming = userAppointments.filter(app => app.status === "CONFIRMED")
+        const completed = userAppointments.filter(app => app.status === "COMPLETED")
+
+
         return {
             status: 200,
             msg: "Appointments fetched successfully",
-            userAppointments
+            userAppointments,
+            upcoming,
+            completed,
         }
     } catch (error: any) {
         console.log(error)
@@ -210,7 +216,7 @@ export const getUserAppointmentStats = async () => {
         const user = await requireAuth()
         const id = user.user.id
 
-        const [ total , completed  ] = await Promise.all([
+        const [ total , completed , upcoming ] = await Promise.all([
             prisma.appointment.count({
                 where: { userId: id }
             }),
@@ -219,6 +225,12 @@ export const getUserAppointmentStats = async () => {
                     userId: id,
                     status: "COMPLETED"
                 }
+            }),
+            prisma.appointment.count({
+                where: {
+                    userId: id,
+                    status: "CONFIRMED" 
+                }
             })
         ])
 
@@ -226,7 +238,8 @@ export const getUserAppointmentStats = async () => {
             status: 200,
             msg: "User Appointment Stats fetched successfully",
             total,
-            completed
+            completed,
+            upcoming
         }
     } catch (error: any) {
         console.log(error)

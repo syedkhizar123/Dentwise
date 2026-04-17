@@ -3,6 +3,7 @@
 import { DoctorInfo } from "@/components/appointments/DoctorInfo"
 import { ProgressSteps } from "@/components/appointments/ProgressSteps"
 import { Header } from "@/components/dashboard/Header"
+import { getUserAppointments } from "@/hooks/useAppointments"
 import { usePayment } from "@/hooks/usePayment"
 import { useUser } from "@clerk/nextjs"
 import { Calendar, ChevronLeftIcon, Clock } from "lucide-react"
@@ -93,6 +94,7 @@ const Appointments = () => {
 
     const { isSignedIn, user, isLoaded } = useUser()
     const { mutate: startPayment, isPending } = usePayment()
+    const { data: userAppointments, isPending: appointmentsError, isLoading } = getUserAppointments()
     const router = useRouter()
     const [activeStep, setActiveStep] = useState(1)
     const [selectedDoctor, setSelectedDoctor] = useState<selectedDoctor | null>(null)
@@ -121,6 +123,17 @@ const Appointments = () => {
         }
     }, [selectedType])
 
+    useEffect(() => {
+        console.log("userAppointments: ", userAppointments)
+    }, [userAppointments])
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <p className="text-muted-foreground">Loading...</p>
+            </div>
+        )
+    }
     return (
         <>
             <Header name={user?.fullName || ""} email={user?.emailAddresses[0].emailAddress} />
@@ -150,106 +163,46 @@ const Appointments = () => {
                         <p className="text-lg text-muted font-semibold">Upcoming Appointments</p>
 
                         <div className="flex flex-wrap gap-2">
-                            <div className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNsrCyLyQ8U6WyTBm3KvE9AtbY8SPxtL2M_Q&s'
-                                        className="w-12 h-12 rounded-full object-cover"
-                                        alt="Doctor Image"
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm text-muted">Dr. John Smith</p>
-                                        <p className="text-muted-foreground text-xs">Teeth Cleaning</p>
+                            {
+                                userAppointments?.length === 0 ? (
+                                    <div className="flex items-center">
+                                        <p className="text-muted-foreground">No upcoming appointments</p>
                                     </div>
-                                </div>
+                                ) : (
+                                    userAppointments.map((item: any) => (
+                                        <div key={item.id} className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <img
+                                                    src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNsrCyLyQ8U6WyTBm3KvE9AtbY8SPxtL2M_Q&s'
+                                                    className="w-12 h-12 rounded-full object-cover"
+                                                    alt="Doctor Image"
+                                                />
+                                                <div className="flex flex-col gap-1">
+                                                    <p className="text-sm text-muted">Dr. John Smith</p>
+                                                    <p className="text-muted-foreground text-xs">{item.reason}</p>
+                                                </div>
+                                            </div>
 
-                                <div className="flex gap-2 items-center mt-3">
-                                    <Calendar className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">Apr 16, 2026</p>
-                                </div>
+                                            <div className="flex gap-2 items-center mt-3">
+                                                <Calendar className="text-muted" size={14} />
+                                                <p className="text-muted-foreground text-sm">{item.date}</p>
+                                            </div>
 
-                                <div className="flex gap-2 items-center mt-1">
-                                    <Clock className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">09:00</p>
-                                </div>
-                            </div>
+                                            <div className="flex gap-2 items-center mt-1">
+                                                <Clock className="text-muted" size={14} />
+                                                <p className="text-muted-foreground text-sm">{item.duration}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )
+                            }
 
-                            <div className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNsrCyLyQ8U6WyTBm3KvE9AtbY8SPxtL2M_Q&s'
-                                        className="w-12 h-12 rounded-full object-cover"
-                                        alt="Doctor Image"
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm text-muted">Dr. John Smith</p>
-                                        <p className="text-muted-foreground text-xs">Teeth Cleaning</p>
-                                    </div>
-                                </div>
 
-                                <div className="flex gap-2 items-center mt-3">
-                                    <Calendar className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">Apr 16, 2026</p>
-                                </div>
-
-                                <div className="flex gap-2 items-center mt-1">
-                                    <Clock className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">09:00</p>
-                                </div>
-                            </div>
-
-                            <div className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNsrCyLyQ8U6WyTBm3KvE9AtbY8SPxtL2M_Q&s'
-                                        className="w-12 h-12 rounded-full object-cover"
-                                        alt="Doctor Image"
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm text-muted">Dr. John Smith</p>
-                                        <p className="text-muted-foreground text-xs">Teeth Cleaning</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2 items-center mt-3">
-                                    <Calendar className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">Apr 16, 2026</p>
-                                </div>
-
-                                <div className="flex gap-2 items-center mt-1">
-                                    <Clock className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">09:00</p>
-                                </div>
-                            </div>
-
-                            <div className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNsrCyLyQ8U6WyTBm3KvE9AtbY8SPxtL2M_Q&s'
-                                        className="w-12 h-12 rounded-full object-cover"
-                                        alt="Doctor Image"
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm text-muted">Dr. John Smith</p>
-                                        <p className="text-muted-foreground text-xs">Teeth Cleaning</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2 items-center mt-3">
-                                    <Calendar className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">Apr 16, 2026</p>
-                                </div>
-
-                                <div className="flex gap-2 items-center mt-1">
-                                    <Clock className="text-muted" size={14} />
-                                    <p className="text-muted-foreground text-sm">09:00</p>
-                                </div>
-                            </div>
                         </div>
 
-                        <p className="text-muted-foreground text-sm">+3 more appointments</p>
+                        <p className={`text-muted-foreground text-sm ${userAppointments.length > 3 ? "" : "hidden" }`}>+3 more appointments</p>
 
-                        
+
                     </div>
                 </>
             )}
