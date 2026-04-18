@@ -8,6 +8,8 @@ interface ActivityProps {
 }
 
 export const Activity = ({ total , completed, month, year }: ActivityProps) => {
+
+    console.log(total , completed)
     return (
         <div className="w-[95%] sm:w-[80%] mx-auto py-10 flex flex-col min-[860px]:flex-row justify-between items-start gap-5">
 
@@ -23,12 +25,12 @@ export const Activity = ({ total , completed, month, year }: ActivityProps) => {
 
                 <div className="flex flex-wrap gap-3">
                     <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
-                        <p className="text-2xl font-bold text-primary">{total}</p>
+                        <p className="text-2xl font-bold text-primary">{completed}</p>
                         <p className="text-muted-foreground text-sm">Completed Visits</p>
                     </div>
 
                     <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
-                        <p className="text-2xl font-bold text-primary">{completed}</p>
+                        <p className="text-2xl font-bold text-primary">{total}</p>
                         <p className="text-muted-foreground text-sm">Total Appointments</p>
                     </div>
 

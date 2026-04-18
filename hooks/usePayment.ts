@@ -8,11 +8,13 @@ export const usePayment = () => {
             doctorId,
             date,
             time,
+            duration,
             amount
         }: {
             doctorId: string | null
             date: string
             time: string
+            duration: string | null
             amount: number | null
         }) => {
 
@@ -25,6 +27,7 @@ export const usePayment = () => {
                     doctorId,
                     date,
                     time,
+                    duration,
                     amount
                 }),
             })

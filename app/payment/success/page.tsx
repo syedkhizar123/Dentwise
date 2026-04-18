@@ -2,10 +2,12 @@
 import { useUser } from "@clerk/nextjs"
 import { Calendar, CircleCheckBig, Clock, Mail, User } from "lucide-react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 const PaymentCompleted = () => {
 
     const { user } = useUser()
+    const router = useRouter()
     return (
         <div className="flex items-center justify-center h-screen px-5">
             <div className="flex flex-col gap-1 items-center justify-center rounded-lg bg-muted-foreground/5 border border-muted/10 px-5 py-10 max-w-110 w-full h-max max-h-[95%]">
@@ -45,11 +47,11 @@ const PaymentCompleted = () => {
                     </div>
 
                 </div>
-
-                <button className="w-full max-w-80 bg-primary/70 rounded-lg flex justify-center items-center py-3 mt-4">
+                
+                <button onClick={() => { router.push("/appointments") }} className="w-full max-w-80 bg-primary/70 rounded-lg flex justify-center items-center py-3 mt-4">
                     <p className="text-black text-sm">View My Appointments</p>
                 </button>
-                <button className="w-full max-w-80 bg-muted-foreground/10 rounded-lg flex justify-center items-center py-3 mt-1">
+                <button onClick={() => { router.push("/dashboard") }} className="w-full max-w-80 bg-muted-foreground/10 rounded-lg flex justify-center items-center py-3 mt-1">
                     <p className="text-muted text-sm">Continue</p>
                 </button>
             </div>

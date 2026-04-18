@@ -4,7 +4,7 @@ import { Actions } from "@/components/dashboard/Actions"
 import { Activity } from "@/components/dashboard/Activity"
 import { Header } from "@/components/dashboard/Header"
 import { Welcome } from "@/components/dashboard/Welcome"
-import { getUserAppointments } from "@/hooks/useAppointments"
+import {  getUserAppointmentsStats } from "@/hooks/useAppointments"
 import { useSyncUser } from "@/hooks/useSyncUser"
 import { useUser } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
@@ -12,7 +12,7 @@ import { useEffect } from "react"
 
 const Dashboard = () => {
 
-    const { data , isLoading , isError , error} = getUserAppointments() 
+    const { data , isLoading , isError , error} = getUserAppointmentsStats() 
     const { mutate } = useSyncUser()
     const { isSignedIn, user, isLoaded } = useUser()
     const router = useRouter()

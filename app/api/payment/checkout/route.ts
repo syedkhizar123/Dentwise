@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/middleware/auth";
 import { stripe } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,17 +8,19 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json()
 
-        const { doctorId, userId, date, time, duration, notes, reason, amount } = body
+        const { doctorId, date, time, duration, notes, reason, amount } = body
         console.log("CHECKOUT BODY:", body)
         console.log("METADATA SENT:", {
             doctorId,
-            userId,
             date,
             time,
             duration,
         })
 
-        if (!userId || !doctorId || !date || !time || !amount) {
+        const authUser = await requireAuth()
+        const userId = authUser.user.clerkId
+
+        if (!userId ) {
             throw new Error("Missing required checkout fields")
         }
 

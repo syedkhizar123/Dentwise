@@ -23,22 +23,22 @@ const Appointments = () => {
     const appointmentTypes = [
         {
             type: "Regular Checkup",
-            time: 60,
+            time: "60",
             price: 120
         },
         {
             type: "Teeth Cleaning",
-            time: 45,
+            time: "45",
             price: 90
         },
         {
             type: "Consultation",
-            time: 30,
+            time: "30",
             price: 75
         },
         {
             type: "Emergency Visit",
-            time: 30,
+            time: "30",
             price: 150
         }
 
@@ -101,7 +101,7 @@ const Appointments = () => {
     const [selectedType, setSelectedType] = useState<string | null>(null)
     const [selectedDate, setSelectedDate] = useState<string | null>(null)
     const [selectedTime, setSelectedTime] = useState<string | null>(null)
-    const [duration, setDuration] = useState<number | null>(null)
+    const [duration, setDuration] = useState<string | null>(null)
     const [price, setPrice] = useState<number | null>(null)
 
     useEffect(() => {
@@ -190,7 +190,7 @@ const Appointments = () => {
 
                                             <div className="flex gap-2 items-center mt-1">
                                                 <Clock className="text-muted" size={14} />
-                                                <p className="text-muted-foreground text-sm">{item.duration}</p>
+                                                <p className="text-muted-foreground text-sm">{item.time}</p>
                                             </div>
                                         </div>
                                     ))
@@ -399,11 +399,12 @@ const Appointments = () => {
                             <p className="text-muted text-sm">Modify Appointment</p>
                         </button>
 
-                        <button disabled={isPending} onClick={() => {
+                        <button disabled={isPending || !duration} onClick={() => {
                             startPayment({
                                 doctorId: selectedDoctor?.id || null,
-                                date: selectedDate,
+                                date: new Date(selectedDate).toISOString(),
                                 time: selectedTime,
+                                duration,
                                 amount: price
                             })
                         }} className={`rounded-sm px-5 py-3 ${isPending ? "bg-muted-foreground cursor-not-allowed" : "bg-primary"}`}>
