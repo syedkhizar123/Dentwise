@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const getUserAppointments = () => {
     return useQuery({
@@ -27,5 +27,26 @@ export const getUserAppointmentsStats = () => {
             }
             return data
         }
+    })
+}
+
+export const useGetBookedSlots = (doctorId?: string , date?: string) => {
+    return useQuery({
+        queryKey: ["Booked-Slots" , doctorId , date],
+        queryFn: async () => {
+            const res = await fetch("/api/appointments/booked-slots" , {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ doctorId , date})
+            })
+            const data = await res.json()
+            if (!res.ok) {
+                throw new Error(data?.msg || "Failed to fetch")
+            }
+            return data
+        },
+        enabled: !!doctorId && !!date
     })
 }

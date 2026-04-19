@@ -103,7 +103,10 @@ export const getUserAppointments = async () => {
 
         const id = user.user.id
         const userAppointments = await prisma.appointment.findMany({
-            where: { userId: id }
+            where: { userId: id },
+            include: {
+                doctor: true
+            }
         })
 
         const upcoming = userAppointments.filter(app => app.status === "CONFIRMED")

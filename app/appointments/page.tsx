@@ -3,7 +3,7 @@
 import { DoctorInfo } from "@/components/appointments/DoctorInfo"
 import { ProgressSteps } from "@/components/appointments/ProgressSteps"
 import { Header } from "@/components/dashboard/Header"
-import { getUserAppointments } from "@/hooks/useAppointments"
+import { getUserAppointments, useGetBookedSlots } from "@/hooks/useAppointments"
 import { usePayment } from "@/hooks/usePayment"
 import { useUser } from "@clerk/nextjs"
 import { Calendar, ChevronLeftIcon, Clock } from "lucide-react"
@@ -16,6 +16,12 @@ interface selectedDoctor {
     name: string,
     img: string,
     speciality: string
+}
+
+type DateItem = {
+    date: Date
+    iso: string
+    label: string
 }
 
 const Appointments = () => {
@@ -43,36 +49,25 @@ const Appointments = () => {
         }
 
     ]
-    const dates = [
-        {
-            day: "Sun",
-            date: "Apr 11"
-        },
-        {
-            day: "Mon",
-            date: "Apr 12"
-        },
-        {
-            day: "Tue",
-            date: "Apr 13"
-        },
-        {
-            day: "Wed",
-            date: "Apr 14"
-        },
-        {
-            day: "Thu",
-            date: "Apr 15"
-        },
-        {
-            day: "Fri",
-            date: "Apr 16"
-        },
-        {
-            day: "Sat",
-            date: "Apr 17"
-        }
-    ]
+    const days: DateItem[] = []
+
+    const today = new Date()
+
+    for (let i = 1; i <= 7; i++) {
+        const nextDate = new Date(today)
+        nextDate.setDate(today.getDate() + i)
+
+        days.push({
+            date: nextDate,
+            iso: nextDate.toISOString(),
+            label: nextDate.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+            }),
+        })
+    }
+
     const times = ["9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"]
 
     const handleSecondStep = () => {
@@ -92,6 +87,15 @@ const Appointments = () => {
         }
     }
 
+    // The user must select the date before selecting time
+    const handleTimeSelection = () => {
+        if (!selectedDate) {
+            return (
+                toast.error("Select date first")
+            )
+        }
+    }
+
     const { isSignedIn, user, isLoaded } = useUser()
     const { mutate: startPayment, isPending } = usePayment()
     const { data: userAppointments, isPending: appointmentsError, isLoading } = getUserAppointments()
@@ -103,6 +107,8 @@ const Appointments = () => {
     const [selectedTime, setSelectedTime] = useState<string | null>(null)
     const [duration, setDuration] = useState<string | null>(null)
     const [price, setPrice] = useState<number | null>(null)
+    const { data: bookedSlots } = useGetBookedSlots(selectedDoctor?.id, selectedDate!)
+
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
@@ -110,9 +116,6 @@ const Appointments = () => {
         }
     }, [isLoaded, isSignedIn])
 
-    useEffect(() => {
-        console.log("Selected Time:- ", selectedTime)
-    }, [selectedTime])
 
     useEffect(() => {
         console.log("Selected Type:- ", selectedType)
@@ -122,10 +125,6 @@ const Appointments = () => {
             setPrice(appointment!.price)
         }
     }, [selectedType])
-
-    useEffect(() => {
-        console.log("userAppointments: ", userAppointments)
-    }, [userAppointments])
 
     if (isLoading) {
         return (
@@ -173,19 +172,24 @@ const Appointments = () => {
                                         <div key={item.id} className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
                                             <div className="flex items-center gap-3">
                                                 <img
-                                                    src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNsrCyLyQ8U6WyTBm3KvE9AtbY8SPxtL2M_Q&s'
+                                                    src={item.doctor.imageUrl}
                                                     className="w-12 h-12 rounded-full object-cover"
                                                     alt="Doctor Image"
                                                 />
                                                 <div className="flex flex-col gap-1">
-                                                    <p className="text-sm text-muted">Dr. John Smith</p>
+                                                    <p className="text-sm text-muted">Dr. {item.doctor.name}</p>
                                                     <p className="text-muted-foreground text-xs">{item.reason}</p>
                                                 </div>
                                             </div>
 
                                             <div className="flex gap-2 items-center mt-3">
                                                 <Calendar className="text-muted" size={14} />
-                                                <p className="text-muted-foreground text-sm">{item.date}</p>
+                                                <p className="text-muted-foreground text-sm">{new Date(item.date).toLocaleDateString("en-US", {
+                                                    weekday: "short",
+                                                    month: "short",
+                                                    day: "numeric"
+                                                })}
+                                                </p>
                                             </div>
 
                                             <div className="flex gap-2 items-center mt-1">
@@ -200,7 +204,7 @@ const Appointments = () => {
 
                         </div>
 
-                        <p className={`text-muted-foreground text-sm ${userAppointments.length > 3 ? "" : "hidden" }`}>+3 more appointments</p>
+                        <p className={`text-muted-foreground text-sm ${userAppointments.length > 3 ? "" : "hidden"}`}>+3 more appointments</p>
 
 
                     </div>
@@ -249,16 +253,19 @@ const Appointments = () => {
 
                             <div className="flex flex-wrap gap-3">
                                 {
-                                    dates.map((item) => (
-                                        <div onClick={() => {
-                                            const newDate = selectedDate === `${item.day}, ${item.date}` ? null : `${item.day}, ${item.date}`
-                                            setSelectedDate(newDate)
-                                        }} key={item.date} className={`w-full sm:w-[48%] border rounded-md py-3 cursor-pointer ${selectedDate === `${item.day}, ${item.date}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}`}>
-                                            <p className={`text-center ${selectedDate === `${item.day}, ${item.date}` ? "text-black" : "text-muted"}`}>
-                                                {item.day}, {item.date}
-                                            </p>
-                                        </div>
-                                    ))
+                                    days.map((item) => {
+                                        const isSelected = selectedDate === item.label
+                                        return (
+                                            <div onClick={() => {
+                                                // const newDate = selectedDate === `${item.iso}` ? null : item.iso
+                                                setSelectedDate(isSelected ? null : item.label)
+                                            }} key={item.iso} className={`w-full sm:w-[48%] border rounded-md py-3 cursor-pointer ${isSelected ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}`}>
+                                                <p className={`text-center ${isSelected ? "text-black" : "text-muted"}`}>
+                                                    {item.label}
+                                                </p>
+                                            </div>
+                                        )
+                                    })
                                 }
                             </div>
 
@@ -268,8 +275,12 @@ const Appointments = () => {
                                 {
                                     times.map((item) => (
                                         <div onClick={() => {
-                                            const newTime = selectedTime === `${item}` ? null : `${item}`
-                                            setSelectedTime(newTime)
+                                            if (selectedDate) {
+                                                const newTime = selectedTime === `${item}` ? null : `${item}`
+                                                setSelectedTime(newTime)
+                                            } else {
+                                                toast.error("Select date please")
+                                            }
                                         }} key={item} className={`w-full sm:w-[48%] md:w-[31%] border rounded-md py-1.5 cursor-pointer ${selectedTime === `${item}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}`}>
                                             <p className={`text-center flex items-center justify-center gap-2 ${selectedTime === `${item}` ? "text-black" : "text-muted"}`}>
                                                 <Clock size={16} className={`${selectedTime === item ? "text-black" : "text-muted"}`} />
@@ -357,41 +368,6 @@ const Appointments = () => {
                             </div>
                         </div>
 
-                        {/* <div className="flex gap-10">
-                            <div className="flex flex-col gap-1">
-                                <p className="text-sm text-muted-foreground">Appointmnet Type</p>
-                                <p className="text-muted">{selectedType}</p>
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                                 <p className="text-sm text-muted-foreground">Duration</p>
-                                <p className="text-muted">30 min</p>
-                            </div>
-                        </div>
-
-                         <div className="flex gap-10">
-                            <div className="flex flex-col gap-1">
-                                <p className="text-sm text-muted-foreground">Date</p>
-                                <p className="text-muted">{selectedDate}</p>
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                                 <p className="text-sm text-muted-foreground">Time</p>
-                                <p className="text-muted">{selectedTime}</p>
-                            </div>
-                        </div>
-
-                         <div className="flex gap-10">
-                            <div className="flex flex-col gap-1">
-                                <p className="text-sm text-muted-foreground">Location</p>
-                                <p className="text-muted">Dental Centre</p>
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                                 <p className="text-sm text-muted-foreground">Cost</p>
-                                <p className="text-primary font-semibold">$75</p>
-                            </div>
-                        </div> */}
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-5 my-5">
@@ -402,9 +378,10 @@ const Appointments = () => {
                         <button disabled={isPending || !duration} onClick={() => {
                             startPayment({
                                 doctorId: selectedDoctor?.id || null,
-                                date: new Date(selectedDate).toISOString(),
+                                date: days.find(d => d.label === selectedDate)!?.iso,
                                 time: selectedTime,
                                 duration,
+                                reason: selectedType,
                                 amount: price
                             })
                         }} className={`rounded-sm px-5 py-3 ${isPending ? "bg-muted-foreground cursor-not-allowed" : "bg-primary"}`}>
