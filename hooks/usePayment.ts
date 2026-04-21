@@ -10,7 +10,8 @@ export const usePayment = () => {
             time,
             duration,
             reason,
-            amount
+            amount,
+            userEmail
         }: {
             doctorId: string | null
             date: string
@@ -18,6 +19,7 @@ export const usePayment = () => {
             duration: string | null
             reason: string | null
             amount: number | null
+            userEmail: string | null
         }) => {
 
             const res = await fetch("/api/payment/checkout", {
@@ -31,7 +33,8 @@ export const usePayment = () => {
                     time,
                     duration,
                     reason,
-                    amount
+                    amount,
+                    userEmail
                 }),
             })
 

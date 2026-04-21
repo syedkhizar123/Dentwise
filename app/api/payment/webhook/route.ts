@@ -3,6 +3,9 @@ import { NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
 import Stripe from "stripe"
+import { Resend } from "resend"
+
+const resend = new Resend(process.env.RESEND_API_KEY!)
 
 export async function POST(req: Request) {
     const headersList = await headers()
@@ -36,7 +39,7 @@ export async function POST(req: Request) {
             time,
             duration,
             notes,
-            reason,
+            reason
         } = metadata
 
         try {
@@ -68,6 +71,21 @@ export async function POST(req: Request) {
                         reason: reason || "",
                     }
                 })
+
+                // Send confirmation email to user
+                const email = session.customer_email || metadata.userEmail
+                if(!email){
+                    console.log("Empty email")
+                    return
+                }
+                const {data , error } = await resend.emails.send({
+                    from: "onboarding@resend.dev",
+                    to: email!,
+                    subject: "Appointment Confirmed",
+                    html: `<p>Your booking is confirmed</p>`,
+                })
+
+                console.log("Email sent:", { data, error })
             }
 
         } catch (error) {

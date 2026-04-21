@@ -102,21 +102,22 @@ export const getUserAppointments = async () => {
         // }
 
         const id = user.user.id
-        const userAppointments = await prisma.appointment.findMany({
-            where: { userId: id },
-            include: {
-                doctor: true
-            }
+
+        const upcoming = await prisma.appointment.findMany({
+            where: { userId: id, status: "CONFIRMED" },
+            include: { doctor: true },
+            orderBy: { date: "asc" }  
         })
 
-        const upcoming = userAppointments.filter(app => app.status === "CONFIRMED")
-        const completed = userAppointments.filter(app => app.status === "COMPLETED")
-
+        const completed = await prisma.appointment.findMany({
+            where: { userId: id, status: "COMPLETED" },
+            include: { doctor: true },
+            orderBy: { date: "desc" }  
+        })
 
         return {
             status: 200,
             msg: "Appointments fetched successfully",
-            userAppointments,
             upcoming,
             completed,
         }
@@ -142,8 +143,12 @@ export const getBookedSlots = async (req: Request) => {
         const { doctorId, date } = body
 
         if (!doctorId || !date) return { status: 400, msg: "Doctor ID and date is required" }
-        const start = new Date(`${date}T00:00:00.000Z`)
-        const end = new Date(`${date}T23:59:59.999Z`)
+
+        const start = new Date(date)
+        start.setHours(0, 0, 0, 0)
+
+        const end = new Date(date)
+        end.setHours(23, 59, 59, 999)
         const bookedSlots = await prisma.appointment.findMany({
             where: {
                 doctorId,
@@ -178,10 +183,10 @@ export const getBookedSlots = async (req: Request) => {
 export const getAppointmentStats = async () => {
     try {
 
-        // const user = await requireAuth()
+        const user = await requireAuth()
 
         // These 2 will run in parallel
-        const [ total , completed  ] = await Promise.all([
+        const [total, completed] = await Promise.all([
             prisma.appointment.count(),
             prisma.appointment.count({
                 where: {
@@ -219,7 +224,7 @@ export const getUserAppointmentStats = async () => {
         const user = await requireAuth()
         const id = user.user.id
 
-        const [ total , completed , upcoming ] = await Promise.all([
+        const [total, completed, upcoming] = await Promise.all([
             prisma.appointment.count({
                 where: { userId: id }
             }),
@@ -232,7 +237,7 @@ export const getUserAppointmentStats = async () => {
             prisma.appointment.count({
                 where: {
                     userId: id,
-                    status: "CONFIRMED" 
+                    status: "CONFIRMED"
                 }
             })
         ])

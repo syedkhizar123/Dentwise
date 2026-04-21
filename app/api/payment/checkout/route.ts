@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json()
 
-        const { doctorId, date, time, duration, notes, reason, amount } = body
+        const { doctorId, date, time, duration, notes, reason, amount , userEmail} = body
         console.log("CHECKOUT BODY:", body)
         console.log("METADATA SENT:", {
             doctorId,
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
                 duration: String(duration),
                 notes: String(notes ?? ""),
                 reason: String(reason ?? ""),
+                userEmail: String(userEmail)
             }
         })
 

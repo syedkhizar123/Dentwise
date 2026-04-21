@@ -3,7 +3,7 @@
 import { DoctorInfo } from "@/components/appointments/DoctorInfo"
 import { ProgressSteps } from "@/components/appointments/ProgressSteps"
 import { Header } from "@/components/dashboard/Header"
-import { getUserAppointments, useGetBookedSlots } from "@/hooks/useAppointments"
+import { getUserAppointments, getBookedSlots } from "@/hooks/useAppointments"
 import { usePayment } from "@/hooks/usePayment"
 import { useUser } from "@clerk/nextjs"
 import { Calendar, ChevronLeftIcon, Clock } from "lucide-react"
@@ -68,7 +68,7 @@ const Appointments = () => {
         })
     }
 
-    const times = ["9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"]
+    const times = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"]
 
     const handleSecondStep = () => {
         if (selectedType) {
@@ -87,28 +87,21 @@ const Appointments = () => {
         }
     }
 
-    // The user must select the date before selecting time
-    const handleTimeSelection = () => {
-        if (!selectedDate) {
-            return (
-                toast.error("Select date first")
-            )
-        }
-    }
-
     const { isSignedIn, user, isLoaded } = useUser()
     const { mutate: startPayment, isPending } = usePayment()
-    const { data: userAppointments, isPending: appointmentsError, isLoading } = getUserAppointments()
+    const { data , isPending: appointmentsError, isLoading } = getUserAppointments()
     const router = useRouter()
     const [activeStep, setActiveStep] = useState(1)
     const [selectedDoctor, setSelectedDoctor] = useState<selectedDoctor | null>(null)
     const [selectedType, setSelectedType] = useState<string | null>(null)
     const [selectedDate, setSelectedDate] = useState<string | null>(null)
+    const [selectedDateIso, setSelectedDateIso] = useState<string | null>(null)
     const [selectedTime, setSelectedTime] = useState<string | null>(null)
     const [duration, setDuration] = useState<string | null>(null)
     const [price, setPrice] = useState<number | null>(null)
-    const { data: bookedSlots } = useGetBookedSlots(selectedDoctor?.id, selectedDate!)
-
+    const { data: bookedSlots, isLoading: fetchBooked } = getBookedSlots(selectedDoctor?.id, selectedDateIso!)
+    const userUpcomingAppointments = data?.upcoming 
+    const userCompletedAppointments = data?.completed
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
@@ -118,13 +111,16 @@ const Appointments = () => {
 
 
     useEffect(() => {
-        console.log("Selected Type:- ", selectedType)
         if (selectedType) {
             const appointment = appointmentTypes.find((app) => app.type === selectedType)
             setDuration(appointment!.time)
             setPrice(appointment!.price)
         }
     }, [selectedType])
+
+    const isSlotBooked = (time: string) => {
+        return bookedSlots?.bookedSlots?.some((slot: any) => slot.time == time)
+    }
 
     if (isLoading) {
         return (
@@ -163,12 +159,12 @@ const Appointments = () => {
 
                         <div className="flex flex-wrap gap-2">
                             {
-                                userAppointments?.length === 0 ? (
+                                userUpcomingAppointments?.length === 0 ? (
                                     <div className="flex items-center">
                                         <p className="text-muted-foreground">No upcoming appointments</p>
                                     </div>
                                 ) : (
-                                    userAppointments.map((item: any) => (
+                                    userUpcomingAppointments.slice(0,3).map((item: any) => (
                                         <div key={item.id} className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
                                             <div className="flex items-center gap-3">
                                                 <img
@@ -204,7 +200,56 @@ const Appointments = () => {
 
                         </div>
 
-                        <p className={`text-muted-foreground text-sm ${userAppointments.length > 3 ? "" : "hidden"}`}>+3 more appointments</p>
+                        <p className={`text-muted-foreground text-sm ${userUpcomingAppointments.length > 3 ? "" : "hidden"}`}>+{userUpcomingAppointments.length - 3} more appointments</p>
+
+
+                    </div>
+
+                     <div className={`w-[95%] sm:w-[80%] mx-auto my-5 flex flex-col gap-3  ${selectedDoctor === null ? "visible" : "hidden"}`}>
+                        <p className="text-lg text-muted font-semibold">Completed Appointments</p>
+
+                        <div className="flex flex-wrap gap-2">
+                            {
+                                userCompletedAppointments?.length === 0 ? (
+                                    <div className="flex items-center">
+                                        <p className="text-muted-foreground">No completed appointments</p>
+                                    </div>
+                                ) : (
+                                    userCompletedAppointments.map((item: any) => (
+                                        <div key={item.id} className="w-full sm:w-[49%] lg:w-[32%] flex flex-col px-5 py-5 border border-muted/10 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <img
+                                                    src={item.doctor.imageUrl}
+                                                    className="w-12 h-12 rounded-full object-cover"
+                                                    alt="Doctor Image"
+                                                />
+                                                <div className="flex flex-col gap-1">
+                                                    <p className="text-sm text-muted">Dr. {item.doctor.name}</p>
+                                                    <p className="text-muted-foreground text-xs">{item.reason}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-2 items-center mt-3">
+                                                <Calendar className="text-muted" size={14} />
+                                                <p className="text-muted-foreground text-sm">{new Date(item.date).toLocaleDateString("en-US", {
+                                                    weekday: "short",
+                                                    month: "short",
+                                                    day: "numeric"
+                                                })}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex gap-2 items-center mt-1">
+                                                <Clock className="text-muted" size={14} />
+                                                <p className="text-muted-foreground text-sm">{item.time}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )
+                            }
+
+
+                        </div>
 
 
                     </div>
@@ -258,7 +303,16 @@ const Appointments = () => {
                                         return (
                                             <div onClick={() => {
                                                 // const newDate = selectedDate === `${item.iso}` ? null : item.iso
-                                                setSelectedDate(isSelected ? null : item.label)
+                                                if (isSelected) {
+                                                    setSelectedDate(null)
+                                                    setSelectedDateIso(null)
+                                                    setSelectedTime(null)
+                                                } else {
+                                                    setSelectedDate(item.label)
+                                                    setSelectedDateIso(item.iso)
+                                                }
+                                                // setSelectedDate(isSelected ? null : item.label)
+                                                // setSelectedDateIso(isSelected ? null : item.iso)
                                             }} key={item.iso} className={`w-full sm:w-[48%] border rounded-md py-3 cursor-pointer ${isSelected ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}`}>
                                                 <p className={`text-center ${isSelected ? "text-black" : "text-muted"}`}>
                                                     {item.label}
@@ -273,21 +327,36 @@ const Appointments = () => {
 
                             <div className="flex flex-wrap gap-3">
                                 {
-                                    times.map((item) => (
-                                        <div onClick={() => {
-                                            if (selectedDate) {
-                                                const newTime = selectedTime === `${item}` ? null : `${item}`
-                                                setSelectedTime(newTime)
-                                            } else {
-                                                toast.error("Select date please")
-                                            }
-                                        }} key={item} className={`w-full sm:w-[48%] md:w-[31%] border rounded-md py-1.5 cursor-pointer ${selectedTime === `${item}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"}`}>
-                                            <p className={`text-center flex items-center justify-center gap-2 ${selectedTime === `${item}` ? "text-black" : "text-muted"}`}>
-                                                <Clock size={16} className={`${selectedTime === item ? "text-black" : "text-muted"}`} />
-                                                {item}
-                                            </p>
-                                        </div>
-                                    ))
+                                    times.map((item) => {
+                                        const isBooked = isSlotBooked(item)
+                                        if (
+                                            selectedTime &&
+                                            bookedSlots?.bookedSlots?.some(
+                                                (slot: any) => slot.time?.slice(0, 5) === selectedTime
+                                            )
+                                        ) {
+                                            setSelectedTime(null)
+                                        }
+                                        return (
+                                            <div onClick={() => {
+                                                if (isBooked) {
+                                                    toast.error("Slot already booked");
+                                                    return
+                                                }
+                                                if (selectedDate) {
+                                                    const newTime = selectedTime === `${item}` ? null : `${item}`
+                                                    setSelectedTime(newTime)
+                                                } else {
+                                                    toast.error("Select date please")
+                                                }
+                                            }} key={item} className={`w-full sm:w-[48%] md:w-[31%] border rounded-md py-1.5 cursor-pointer  ${selectedTime === `${item}` ? "bg-primary border-primary" : "border-muted/15 bg-muted-foreground/10"} ${isBooked ? "bg-muted-foreground/15 border-muted-foreground/30 cursor-not-allowed" : ""}`}>
+                                                <p className={`text-center flex items-center justify-center gap-2 ${isBooked ? "text-muted-foreground/30" : ""} ${selectedTime === `${item}` ? "text-black" : "text-muted"}`}>
+                                                    <Clock size={16} className={`${selectedTime === item ? "text-black" : "text-muted"} ${isBooked ? "text-muted-foreground/30" : ""}`} />
+                                                    {item}
+                                                </p>
+                                            </div>
+                                        )
+                                    })
                                 }
                             </div>
 
@@ -378,11 +447,12 @@ const Appointments = () => {
                         <button disabled={isPending || !duration} onClick={() => {
                             startPayment({
                                 doctorId: selectedDoctor?.id || null,
-                                date: days.find(d => d.label === selectedDate)!?.iso,
+                                date: selectedDateIso!,
                                 time: selectedTime,
                                 duration,
                                 reason: selectedType,
-                                amount: price
+                                amount: price,
+                                userEmail: user?.emailAddresses[0].emailAddress!
                             })
                         }} className={`rounded-sm px-5 py-3 ${isPending ? "bg-muted-foreground cursor-not-allowed" : "bg-primary"}`}>
                             <p className={`text-sm ${isPending ? "text-muted" : "text-black"}`}>{isPending ? "Processing..." : "Confirm Booking"}</p>

@@ -11,7 +11,7 @@ export const getUserAppointments = () => {
             if (!res.ok) {
                 throw new Error(data?.msg || "Failed to fetch")
             }
-            return data.upcoming
+            return data
         }
     })
 }
@@ -30,16 +30,16 @@ export const getUserAppointmentsStats = () => {
     })
 }
 
-export const useGetBookedSlots = (doctorId?: string , date?: string) => {
+export const getBookedSlots = (doctorId?: string, date?: string) => {
     return useQuery({
-        queryKey: ["Booked-Slots" , doctorId , date],
+        queryKey: ["Booked-Slots", doctorId, date],
         queryFn: async () => {
-            const res = await fetch("/api/appointments/booked-slots" , {
+            const res = await fetch("/api/appointments/booked-slots", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ doctorId , date})
+                body: JSON.stringify({ doctorId, date })
             })
             const data = await res.json()
             if (!res.ok) {

@@ -11,7 +11,8 @@ interface ActivityProps {
 export const Activity = ({ total, completed, month, year }: ActivityProps) => {
 
     const { data , isLoading} = getUserAppointments()
-    console.log(data)
+    const upcoming = data?.upcoming
+    console.log(upcoming)
 
     if(isLoading){
         return (
@@ -96,8 +97,8 @@ export const Activity = ({ total, completed, month, year }: ActivityProps) => {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <p className="text-sm text-muted">Dr. {data[0].doctor.name}</p>
-                            <p className="text-xs text-muted-foreground">{data[0].reason}</p>
+                            <p className="text-sm text-muted">Dr. {upcoming[0].doctor.name}</p>
+                            <p className="text-xs text-muted-foreground">{upcoming[0].reason}</p>
                         </div>
                     </div>
 
@@ -107,7 +108,7 @@ export const Activity = ({ total, completed, month, year }: ActivityProps) => {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <p className="text-sm text-muted">{new Date(data[0].date).toLocaleDateString("en-US", {
+                            <p className="text-sm text-muted">{new Date(upcoming[0].date).toLocaleDateString("en-US", {
                                 weekday: "long",
                                 month: "long",
                                 day: "numeric",
@@ -124,7 +125,7 @@ export const Activity = ({ total, completed, month, year }: ActivityProps) => {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <p className="text-sm text-muted">{data[0].time}</p>
+                            <p className="text-sm text-muted">{upcoming[0].time}</p>
                             <p className="text-xs text-muted-foreground">Local Time</p>
                         </div>
                     </div>
