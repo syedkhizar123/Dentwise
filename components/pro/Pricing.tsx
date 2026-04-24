@@ -7,18 +7,48 @@ import { useEffect, useState } from "react"
 
 export const Pricing = () => {
 
-    const { data , isLoading , isError  } = useGetUser()
-    const [ currentPlan , setCurrentPlan ] = useState<string | null>(null)
+    const { data: user, isLoading, isError } = useGetUser()
+    const [currentPlan, setCurrentPlan] = useState<string | null>(null)
 
-      useEffect(() => {
-        if(data?.plan) {
-            setCurrentPlan(data.plan)
+    useEffect(() => {
+        if (user?.plan) {
+            setCurrentPlan(user.plan)
         }
-    } , [data])
+    }, [user])
 
-    if(isLoading) {
+    const handleSubscribe = async (plan: "STANDARD" | "PRO") => {
+        try {
+            const res = await fetch("/api/billing/checkout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId: user?.id,
+                    plan,
+                    email: user?.email
+                })
+            })
+
+            const data = await res.json()
+            console.log("Response: ", data)
+
+            if (!data.url) {
+                console.log("No URL returned :- ", data)
+            }
+
+            if (res.ok) {
+                window.location.href = data.url
+            }
+
+        } catch (error) {
+            console.log("Subscription error", error)
+        }
+    }
+
+    if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-screen w-screen">
+            <div className="flex items-center justify-center mt-10 w-screen">
                 <p className="text-muted">Loading...</p>
             </div>
         )
@@ -29,11 +59,11 @@ export const Pricing = () => {
             <p className="text-muted-foreground mx-auto">Select the perfect plan for your dental care needs. All plans include secure access and bank-level encryption.</p>
             <div className="flex flex-wrap gap-3 my-10 justify-center">
                 <div className="flex flex-col gap-1 bg-white rounded-lg w-90">
-                   <div className="flex justify-between mt-4 mx-4">
-                    <p className="text-black font-bold">Free</p>
-                    <div className={`px-3 py-1 rounded-sm bg-amber-500 ${currentPlan === "FREE" ? "visible" : "invisible"}`}>
-                        <p className="text-xs text-white">Active</p>
-                    </div>
+                    <div className="flex justify-between mt-4 mx-4">
+                        <p className="text-black font-bold">Free</p>
+                        <div className={`px-3 py-1 rounded-sm bg-amber-500 ${currentPlan === "FREE" ? "visible" : "invisible"}`}>
+                            <p className="text-xs text-white">Active</p>
+                        </div>
                     </div>
                     <p className="text-muted-foreground text-sm mx-4">Essential Dental Appointment Booking</p>
                     <p className="text-black text-2xl font-semibold mx-4 mt-3">$0</p>
@@ -66,12 +96,12 @@ export const Pricing = () => {
 
                 </div>
 
-                 <div className="flex flex-col gap-1 bg-white rounded-lg w-90">
+                <div className="flex flex-col gap-1 bg-white rounded-lg w-90">
                     <div className="flex justify-between mt-4 mx-4">
-                    <p className="text-black font-bold">AI Basic</p>
-                    <div className={`px-3 py-1 rounded-sm bg-amber-500 ${currentPlan === "STANDARD" ? "visible" : "invisible"}`}>
-                        <p className="text-xs text-white">Active</p>
-                    </div>
+                        <p className="text-black font-bold">AI Basic</p>
+                        <div className={`px-3 py-1 rounded-sm bg-amber-500 ${currentPlan === "STANDARD" ? "visible" : "invisible"}`}>
+                            <p className="text-xs text-white">Active</p>
+                        </div>
                     </div>
                     <p className="text-muted-foreground text-sm mx-4">AI Consultations + Appointment Booking</p>
                     <p className="text-black text-2xl font-semibold mx-4 mt-3">$9<span className="text-muted-foreground text-sm">/month</span></p>
@@ -98,18 +128,18 @@ export const Pricing = () => {
                         </div>
                     </div>
 
-                    <button className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-3 ${currentPlan === "STANDARD" ? "invisible" : "visible"}`} >
+                    <button onClick={() => { handleSubscribe("STANDARD") }} className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-3 ${currentPlan === "STANDARD" ? "invisible" : "visible"}`} >
                         Switch to this plan
                     </button>
 
                 </div>
 
-                 <div className="flex flex-col gap-1 bg-white rounded-lg w-90">
+                <div className="flex flex-col gap-1 bg-white rounded-lg w-90">
                     <div className="flex justify-between mt-4 mx-4">
-                    <p className="text-black font-bold">AI PRO</p>
-                    <div className={`px-3 py-1 rounded-sm bg-amber-500 ${currentPlan === "PRO" ? "visible" : "invisible"}`}>
-                        <p className="text-xs text-white">Active</p>
-                    </div>
+                        <p className="text-black font-bold">AI PRO</p>
+                        <div className={`px-3 py-1 rounded-sm bg-amber-500 ${currentPlan === "PRO" ? "visible" : "invisible"}`}>
+                            <p className="text-xs text-white">Active</p>
+                        </div>
                     </div>
                     <p className="text-muted-foreground text-sm mx-4">Unlimited AI Consultations</p>
                     <p className="text-black text-2xl font-semibold mx-4 mt-3">$19<span className="text-muted-foreground text-sm">/month</span></p>
@@ -136,7 +166,7 @@ export const Pricing = () => {
                         </div>
                     </div>
 
-                    <button className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-5 ${currentPlan === "PRO" ? "invisible" : "visible"}`} >
+                    <button onClick={() => { handleSubscribe("PRO") }} className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-5 ${currentPlan === "PRO" ? "invisible" : "visible"}`} >
                         Switch to this plan
                     </button>
 

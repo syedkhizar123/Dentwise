@@ -38,9 +38,9 @@ export async function POST(req: Request) {
 
             let plan: Plan = Plan.FREE
 
-            if (priceId === process.env.STRIPE_PRICE_STANDARD) {
+            if (priceId === process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID) {
                 plan = Plan.STANDARD
-            } else if (priceId === process.env.STRIPE_PRICE_PRO) {
+            } else if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID) {
                 plan = Plan.PRO
             }
 

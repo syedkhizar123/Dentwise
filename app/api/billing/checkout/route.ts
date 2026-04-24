@@ -8,7 +8,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 export async function POST(req: Request) {
     try {
 
-        const { userId, priceId, email } = await req.json()
+        const { userId, plan, email } = await req.json()
+        let priceId = ""
+
+        if (plan === "STANDARD") {
+            priceId = process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID!
+        } else if (plan === "PRO") {
+            priceId = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!
+        } else {
+            return NextResponse.json({ error: "Invalid plan" }, { status: 400 })
+        }
+
         const user = await prisma.user.findUnique({
             where: { id: userId }
         })
@@ -38,8 +48,8 @@ export async function POST(req: Request) {
                     quantity: 1
                 }
             ],
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pro`
+            success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
+            cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/pro`
         })
 
         return NextResponse.json({ url: session.url }, { status: 200 })
