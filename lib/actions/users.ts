@@ -30,8 +30,54 @@ export const syncUser = async () => {
         return NextResponse.json({ msg: "User created in DB", user: newUser }, { status: 201 })
     } catch (error) {
         console.log(error)
-
         return NextResponse.json({ msg: "Internal Server error", error }, { status: 500 })
     }
 
+}
+
+export const getUser = async () => {
+    // try {
+    //     const clerkUser = await currentUser()
+    //     if (!clerkUser) throw new Error("Unauthorized")
+    //     const existingUser = await prisma.user.findUnique({
+    //         where: { clerkId: clerkUser.id },
+    //          select: {
+    //             id: true,
+    //             clerkId: true,
+    //             email: true,
+    //             firstName: true,
+    //             lastName: true,
+    //             plan: true,
+    //             createdAt: true,
+    //         }
+    //     })
+
+    //     if (!existingUser) throw new Error("User not found")
+
+    //     return existingUser
+
+    // } catch (error) {
+    //     console.log(error)
+    //     return NextResponse.json({ msg: "Internal Server error", error }, { status: 500 })
+    // }
+
+    const clerkUser = await currentUser()
+    if (!clerkUser) throw new Error("Unauthorized")
+
+    const existingUser = await prisma.user.findUnique({
+        where: { clerkId: clerkUser.id },
+        select: {
+            id: true,
+            clerkId: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            plan: true,
+            createdAt: true,
+        }
+    })
+
+    if (!existingUser) throw new Error("User not found")
+
+    return existingUser
 }

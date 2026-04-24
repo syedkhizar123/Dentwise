@@ -13,14 +13,18 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  clerkId      String        @unique
-  email        String        @unique
-  firstName    String?
-  lastName     String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @default(now())
-  appointments Appointment[]
+  id                   String        @id @default(cuid())
+  clerkId              String        @unique
+  email                String        @unique
+  firstName            String?
+  lastName             String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @default(now())
+  appointments         Appointment[]
+  plan                 Plan          @default(FREE)
+  stripeCustomerId     String?       @unique
+  stripeSubscriptionId String?       @unique
+  subscriptionEnds     DateTime?
 
   @@map("users")
 }
@@ -56,8 +60,8 @@ model Appointment {
   userId   String
   doctorId String
 
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@map("appointments")
 }
@@ -70,4 +74,10 @@ enum Gender {
 enum AppointmentStatus {
   CONFIRMED
   COMPLETED
+}
+
+enum Plan {
+  FREE
+  STANDARD
+  PRO
 }

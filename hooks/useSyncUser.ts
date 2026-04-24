@@ -1,6 +1,6 @@
 "use client"
 
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useSyncUser = () => {
     return useMutation({
@@ -26,3 +26,19 @@ export const useSyncUser = () => {
     })
 
 }
+
+export const useGetUser = () => {
+    return useQuery({
+        queryKey: ["current-user"],
+        queryFn: async () => {
+            const res = await fetch("/api/users/getUser")
+            const data = await res.json()
+
+            if (!res.ok) {
+                throw new Error(data?.error || "Failed to fetch user")
+            }
+
+            return data.user
+        }
+    })
+} 
