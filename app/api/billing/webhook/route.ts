@@ -1,6 +1,5 @@
 import { Plan } from "@/app/generated/prisma";
 import { prisma } from "@/lib/prisma";
-import { TextQuote } from "lucide-react";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 
@@ -71,7 +70,35 @@ export async function POST(req: Request) {
         }
 
         case "invoice.payment_succeeded": {
-            console.log("Payment succeeded")
+            const invoice = event.data.object as Stripe.Invoice
+            const subscriptionId = (invoice.parent as any)?.subscription_details?.subscription as string
+            const customerId = invoice.customer as string
+
+            if (!subscriptionId) {
+                console.log("No subscription ID found")
+                break
+            }
+
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+            const priceId = subscription.items.data[0].price.id
+
+            let plan: Plan = Plan.FREE
+
+            if (priceId === process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID) {
+                plan = Plan.STANDARD
+            } else if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID) {
+                plan = Plan.PRO
+            }
+
+            await prisma.user.update({
+                where: { stripeCustomerId: customerId },
+                data: {
+                    plan,
+                    stripeSubscriptionId: subscriptionId
+                }
+            })
+            console.log("Payment Invoice succeeded")
+
             break
         }
 
@@ -82,5 +109,5 @@ export async function POST(req: Request) {
     }
 
     return new Response("ok", { status: 200 })
-    
+
 }

@@ -2,10 +2,28 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: Request) {
+
+    // function isUpgrade(current: string, next: string) {
+    //     const order = [
+    //         process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID,
+    //         process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID
+    //     ]
+
+    //     return order.indexOf(next) > order.indexOf(current)
+    // }
+
+    // function isDowngrade(current: string, next: string) {
+    //     const order = [
+    //         process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID,
+    //         process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID
+    //     ]
+
+    //     return order.indexOf(next) < order.indexOf(current)
+    // }
+
     try {
 
         const { userId, plan, email } = await req.json()
@@ -23,6 +41,25 @@ export async function POST(req: Request) {
             where: { id: userId }
         })
 
+        console.log("stripeSubscriptionId:", user?.stripeSubscriptionId)
+        console.log("stripeCustomerId:", user?.stripeCustomerId)
+
+        if (user?.stripeSubscriptionId) {
+            const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId)
+
+            await stripe.subscriptions.update(user.stripeSubscriptionId, {
+                items: [
+                    {
+                        id: subscription.items.data[0].id,
+                        price: priceId
+                    }
+                ],
+
+                proration_behavior: "always_invoice",
+                payment_behavior: "error_if_incomplete"
+            })
+
+        }
         let customerId = user?.stripeCustomerId
 
         if (!customerId) {
@@ -37,6 +74,11 @@ export async function POST(req: Request) {
                 data: { stripeCustomerId: customerId }
             })
         }
+        console.log("Price IDs from env:", {
+            standard: process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID,
+            pro: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
+            selectedPriceId: priceId
+        })
 
         const session = await stripe.checkout.sessions.create({
             mode: "subscription",
@@ -58,3 +100,4 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }
 }
+

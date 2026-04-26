@@ -3,6 +3,8 @@
 import Image from "next/image"
 import Vapi from "@vapi-ai/web"
 import { useEffect, useRef, useState } from "react"
+import { useGetUser } from "@/hooks/useSyncUser"
+import toast from "react-hot-toast"
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY!)
 
@@ -19,9 +21,18 @@ export const Call = ({ image, name }: CallProps) => {
     const [userStatus, setUserStatus] = useState("Ready")
     const [callData, setCallData] = useState<any[]>([])
     const containerRef = useRef<HTMLDivElement | null>(null)
+    const { data , isLoading , isError} = useGetUser()
+
+    useEffect(() => {
+        console.log(data)
+    } , [data])
 
     const startCall = async () => {
         try {
+            if(data?.plan === "FREE" || null){
+                toast.error("Upgrade to use the feature")
+                return
+            }
             setIsLoadingCall(true)
             await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!)
         } catch (error) {
@@ -44,7 +55,6 @@ export const Call = ({ image, name }: CallProps) => {
         })
 
         vapi.on("message", (msg: any) => {
-            console.log("Msg: ", msg)
 
             if (msg.type === "speech-update") {
                 if (msg.role === "assistant") {
@@ -108,6 +118,22 @@ export const Call = ({ image, name }: CallProps) => {
             containerRef.current.scrollTop = containerRef.current.scrollHeight
         }
     }, [callData])
+
+   if(isLoading){
+    return (
+        <div className="flex items-center justify-center">
+            <p className="text-muted">Loading...</p>
+        </div>
+    )
+   }
+
+   if(isError){
+    return (
+        <div className="flex items-center justify-center">
+            <p className="text-muted">Something went wrong.</p>
+        </div>
+    )
+   }
 
     return (
         <div className="w-[95%] sm:w-[80%] mx-auto py-10 flex flex-col gap-3">
