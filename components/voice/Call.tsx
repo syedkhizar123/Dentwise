@@ -21,19 +21,43 @@ export const Call = ({ image, name }: CallProps) => {
     const [userStatus, setUserStatus] = useState("Ready")
     const [callData, setCallData] = useState<any[]>([])
     const containerRef = useRef<HTMLDivElement | null>(null)
-    const { data , isLoading , isError} = useGetUser()
+    const { data, isLoading, isError } = useGetUser()
+    const bottomRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
         console.log(data)
-    } , [data])
+    }, [data])
 
     const startCall = async () => {
         try {
-            if(data?.plan === "FREE" || null){
+            if (data?.plan === "FREE" || null) {
                 toast.error("Upgrade to use the feature")
                 return
             }
             setIsLoadingCall(true)
+            try {
+
+                const res = await fetch("/api/billing/usage", {
+                    method: "POST"
+                })
+
+                const data = await res.json()
+                console.log("Usage data: ", data)
+
+                if (!data.success) {
+                    if (data.plan === "FREE") {
+                        toast.error("Upgrade to use the feature.")
+                    } else {
+                        toast.error("Monthly Limit Reached.")
+                    }
+                    vapi.stop()
+                    setIsLoadingCall(false)
+                    setIsCallActive(false)
+                    return
+                }
+            } catch (error) {
+                console.error("Error fetching usage data:", error)
+            }
             await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!)
         } catch (error) {
             console.log("Failed to start call", error)
@@ -44,6 +68,10 @@ export const Call = ({ image, name }: CallProps) => {
         vapi.stop()
         setIsCallActive(false)
     }
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [callData])
 
     useEffect(() => {
         vapi.on("call-start", () => {
@@ -119,21 +147,21 @@ export const Call = ({ image, name }: CallProps) => {
         }
     }, [callData])
 
-   if(isLoading){
-    return (
-        <div className="flex items-center justify-center">
-            <p className="text-muted">Loading...</p>
-        </div>
-    )
-   }
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center">
+                <p className="text-muted">Loading...</p>
+            </div>
+        )
+    }
 
-   if(isError){
-    return (
-        <div className="flex items-center justify-center">
-            <p className="text-muted">Something went wrong.</p>
-        </div>
-    )
-   }
+    if (isError) {
+        return (
+            <div className="flex items-center justify-center">
+                <p className="text-muted">Something went wrong.</p>
+            </div>
+        )
+    }
 
     return (
         <div className="w-[95%] sm:w-[80%] mx-auto py-10 flex flex-col gap-3">
@@ -185,13 +213,17 @@ export const Call = ({ image, name }: CallProps) => {
                     </p>
                 ) : (
                     callData.map((msg, index) => (
-                        <div key={index} className="mb-3">
-                            <p className="text-xs text-muted-foreground">
-                                {msg.role === "assistant" ? "Dentwise AI" : "You"}
-                            </p>
-                            <p className="text-sm text-muted/80">
-                                {msg.text}
-                            </p>
+                        <div key={index}>
+                            <div className="mb-3">
+                                <p className="text-xs text-muted-foreground">
+                                    {msg.role === "assistant" ? "Dentwise AI" : "You"}
+                                </p>
+                                <p className="text-sm text-muted/80">
+                                    {msg.text}
+                                </p>
+                            </div>
+
+                            <div ref={bottomRef} />
                         </div>
                     ))
                 )}

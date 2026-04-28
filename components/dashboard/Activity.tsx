@@ -35,17 +35,17 @@ export const Activity = ({ total, completed, month, year }: ActivityProps) => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                    <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="rounded-lg px-12 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">{completed}</p>
                         <p className="text-muted-foreground text-sm">Completed Visits</p>
                     </div>
 
-                    <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="rounded-lg px-12 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">{total}</p>
                         <p className="text-muted-foreground text-sm">Total Appointments</p>
                     </div>
 
-                    <div className="rounded-lg w-65 py-4 px-12 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="rounded-lg px-12 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">{month} {year}</p>
                         <p className="text-muted-foreground text-sm">Member Since</p>
                     </div>

@@ -6,23 +6,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: Request) {
 
-    // function isUpgrade(current: string, next: string) {
-    //     const order = [
-    //         process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID,
-    //         process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID
-    //     ]
-
-    //     return order.indexOf(next) > order.indexOf(current)
-    // }
-
-    // function isDowngrade(current: string, next: string) {
-    //     const order = [
-    //         process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID,
-    //         process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID
-    //     ]
-
-    //     return order.indexOf(next) < order.indexOf(current)
-    // }
 
     try {
 
@@ -44,22 +27,20 @@ export async function POST(req: Request) {
         console.log("stripeSubscriptionId:", user?.stripeSubscriptionId)
         console.log("stripeCustomerId:", user?.stripeCustomerId)
 
-        if (user?.stripeSubscriptionId) {
-            const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId)
+        // if (user?.stripeSubscriptionId) {
+        //     const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId)
 
-            await stripe.subscriptions.update(user.stripeSubscriptionId, {
-                items: [
-                    {
-                        id: subscription.items.data[0].id,
-                        price: priceId
-                    }
-                ],
+        //     await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        //         items: [
+        //             {
+        //                 id: subscription.items.data[0].id,
+        //                 price: priceId
+        //             }
+        //         ],
+        //         proration_behavior: "none", 
+        //     })
 
-                proration_behavior: "always_invoice",
-                payment_behavior: "error_if_incomplete"
-            })
-
-        }
+        // }
         let customerId = user?.stripeCustomerId
 
         if (!customerId) {
@@ -90,6 +71,7 @@ export async function POST(req: Request) {
                     quantity: 1
                 }
             ],
+
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
             cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/pro`
         })
