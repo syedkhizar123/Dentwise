@@ -47,7 +47,8 @@ export async function POST(req: Request) {
                 where: { stripeCustomerId: customerId },
                 data: {
                     plan,
-                    stripeSubscriptionId: subscriptionId
+                    stripeSubscriptionId: subscriptionId,
+                    subscriptionEnds: new Date(subscription.items.data[0].current_period_end * 1000)
                 }
             })
 
@@ -62,7 +63,8 @@ export async function POST(req: Request) {
                 where: { stripeSubscriptionId: subscription.id },
                 data: {
                     plan: Plan.FREE,
-                    stripeSubscriptionId: null
+                    stripeSubscriptionId: null,
+                    subscriptionEnds: null
                 }
             })
 
@@ -71,7 +73,7 @@ export async function POST(req: Request) {
 
         case "invoice.payment_succeeded": {
             const invoice = event.data.object as Stripe.Invoice
-            const subscriptionId = (invoice.parent as any)?.subscription_details?.subscription as string
+            const subscriptionId = (invoice as any).subscription as string | null
             const customerId = invoice.customer as string
 
             if (!subscriptionId) {
@@ -94,7 +96,8 @@ export async function POST(req: Request) {
                 where: { stripeCustomerId: customerId },
                 data: {
                     plan,
-                    stripeSubscriptionId: subscriptionId
+                    stripeSubscriptionId: subscriptionId,
+                    subscriptionEnds: new Date(subscription.items.data[0].current_period_end * 1000)
                 }
             })
             console.log("Payment Invoice succeeded")

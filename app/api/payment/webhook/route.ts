@@ -25,7 +25,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid signature" }, { status: 400 })
     }
 
-    // 🔥 MAIN EVENT
     if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session
 
@@ -43,14 +42,12 @@ export async function POST(req: Request) {
         } = metadata
 
         try {
-            // 🔥 Convert clerkId → DB userId (IMPORTANT)
             const dbUser = await prisma.user.findUnique({
                 where: { clerkId: userId }
             })
 
             if (!dbUser) return NextResponse.json({ error: "User not found" })
 
-            // prevent duplicates
             const existing = await prisma.appointment.findFirst({
                 where: {
                     doctorId,

@@ -3,6 +3,7 @@
 import { useGetUser } from "@/hooks/useSyncUser"
 import { Check } from "lucide-react"
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 
 
 export const Pricing = () => {
@@ -37,8 +38,15 @@ export const Pricing = () => {
                 console.log("No URL returned :- ", data)
             }
 
-            if (res.ok) {
+            if (data.url) {
                 window.location.href = data.url
+            } else if (data.upgraded) {
+                toast.success("Plan upgraded successfully!")
+                window.location.reload()
+            } else if (data.downgradeBlocked) {
+                toast.error(data.message)
+            } else if (data.error) {
+                toast.error(data.error)
             }
 
         } catch (error) {
@@ -50,6 +58,14 @@ export const Pricing = () => {
         return (
             <div className="flex items-center justify-center mt-10 w-screen">
                 <p className="text-muted">Loading...</p>
+            </div>
+        )
+    }
+
+    if (isError) {
+        return (
+            <div className="flex items-center justify-center mt-10 w-screen">
+                <p className="text-muted">Something went wrong.</p>
             </div>
         )
     }
@@ -90,7 +106,7 @@ export const Pricing = () => {
                         </div>
                     </div>
 
-                    <button className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-5 ${currentPlan === "FREE" ? "invisible" : "visible"}`} >
+                    <button onClick={() => {toast.error("Downgrade is not possible")}} className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-5 ${currentPlan === "FREE" ? "invisible" : "visible"}`} >
                         Switch to this plan
                     </button>
 

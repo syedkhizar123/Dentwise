@@ -27,20 +27,73 @@ export async function POST(req: Request) {
         console.log("stripeSubscriptionId:", user?.stripeSubscriptionId)
         console.log("stripeCustomerId:", user?.stripeCustomerId)
 
+
+        let activeSubscription: Stripe.Subscription | null = null;
+
         // if (user?.stripeSubscriptionId) {
-        //     const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId)
+        //     try {
+        //         const sub = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
 
-        //     await stripe.subscriptions.update(user.stripeSubscriptionId, {
-        //         items: [
-        //             {
-        //                 id: subscription.items.data[0].id,
-        //                 price: priceId
+        //         if (sub.status === "active" || sub.status === "trialing") {
+        //             activeSubscription = sub;
+        //         } else {
+        //             await prisma.user.update({
+        //                 where: { id: userId },
+        //                 data: {
+        //                     stripeSubscriptionId: null,
+        //                     plan: "FREE"
+        //                 }
+        //             });
+        //         }
+        //     } catch (err) {
+        //         await prisma.user.update({
+        //             where: { id: userId },
+        //             data: {
+        //                 stripeSubscriptionId: null,
+        //                 plan: "FREE"
         //             }
-        //         ],
-        //         proration_behavior: "none", 
-        //     })
-
+        //         });
+        //     }
         // }
+
+        if (user?.stripeCustomerId) {
+            const subs = await stripe.subscriptions.list({
+                customer: user.stripeCustomerId,
+                status: "active",
+                limit: 1,
+            });
+
+            activeSubscription = subs.data[0] || null;
+        }
+
+        console.log("==== DEBUG PLAN CHECK ====");
+        console.log("DB plan:", user?.plan);
+        console.log("currentPriceId:", activeSubscription ? activeSubscription.items.data[0].price.id : "No active subscription");
+        console.log("requested priceId:", priceId);
+        console.log("STANDARD_PRICE:", process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID);
+        console.log("PRO_PRICE:", process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID);
+        console.log("==========================");
+        if (activeSubscription) {
+
+            const currentPriceId = activeSubscription.items.data[0].price.id
+
+            const STANDARD_PRICE = process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID!
+            const PRO_PRICE = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!
+
+            // ✅ Already on same plan
+            if (currentPriceId === priceId) {
+                return NextResponse.json({ error: "You are already on this plan." }, { status: 400 })
+            }
+
+            // ❌ Block downgrade
+            if (currentPriceId === PRO_PRICE && priceId === STANDARD_PRICE) {
+                return NextResponse.json({
+                    downgradeBlocked: true,
+                    message: "Downgrade is not possible."
+                })
+            }
+        }
+
         let customerId = user?.stripeCustomerId
 
         if (!customerId) {
@@ -82,4 +135,3 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }
 }
-
