@@ -31,6 +31,11 @@ export async function POST(req: Request) {
             const customerId = session.customer as string
             const subscriptionId = session.subscription as string
 
+            if (!subscriptionId) {
+                console.log("No subscription found in session")
+                break
+            }
+
             const subscription = await stripe.subscriptions.retrieve(subscriptionId)
 
             const priceId = subscription.items.data[0].price.id

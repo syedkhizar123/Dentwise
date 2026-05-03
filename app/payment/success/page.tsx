@@ -1,4 +1,5 @@
 "use client"
+import { getUserAppointments } from "@/hooks/useAppointments"
 import { useUser } from "@clerk/nextjs"
 import { Calendar, CircleCheckBig, Clock, Mail, User } from "lucide-react"
 import Image from "next/image"
@@ -8,6 +9,19 @@ const PaymentCompleted = () => {
 
     const { user } = useUser()
     const router = useRouter()
+    const { data, isLoading } = getUserAppointments()
+    const upcoming = data?.upcoming
+    const latestAppointment = upcoming?.sort(
+        (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )[0]
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen px-5">
+                <p>Loading...</p>
+            </div>
+        )
+    }
     return (
         <div className="flex items-center justify-center h-screen px-5">
             <div className="flex flex-col gap-1 items-center justify-center rounded-lg bg-muted-foreground/5 border border-muted/10 px-5 py-10 max-w-110 w-full h-max max-h-[95%]">
@@ -35,19 +49,24 @@ const PaymentCompleted = () => {
                     <p className="text-xs text-muted mx-auto mb-3">Quick Summary</p>
                     <div className="flex gap-2 items-center">
                         <User className="text-muted-foreground" size={16} />
-                        <p className="text-xs text-muted">Dr. Jane Smith </p>
+                        <p className="text-xs text-muted">Dr. {latestAppointment?.doctor?.name} </p>
                     </div>
                     <div className="flex gap-2 items-center">
                         <Calendar className="text-muted-foreground" size={16} />
-                        <p className="text-xs text-muted">Friday, April 17, 2026 </p>
+                        <p className="text-xs text-muted">{new Date(latestAppointment?.date).toLocaleDateString("en-US", {
+                            weekday: "long",
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric"
+                        })} </p>
                     </div>
                     <div className="flex gap-2 items-center">
                         <Clock className="text-muted-foreground" size={16} />
-                        <p className="text-xs text-muted">09:30</p>
+                        <p className="text-xs text-muted">{latestAppointment?.time}</p>
                     </div>
 
                 </div>
-                
+
                 <button onClick={() => { router.push("/appointments") }} className="w-full max-w-80 bg-primary/70 rounded-lg flex justify-center items-center py-3 mt-4">
                     <p className="text-black text-sm">View My Appointments</p>
                 </button>
