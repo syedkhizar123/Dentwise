@@ -1,7 +1,9 @@
 "use server"
 
+import { cache } from "react"
 import { requireAuth } from "../middleware/auth"
 import { prisma } from "../prisma"
+import { redis } from "../redis"
 
 export const createAppointment = async (req: Request) => {
     try {
@@ -71,6 +73,9 @@ export const getAllAppointments = async () => {
             }
         })
 
+        const cacheKey = `appointments:${user.user.id}`
+        await redis.del(cacheKey)
+
         return {
             status: 200,
             msg: "Appointments fetched successfully",
@@ -103,17 +108,39 @@ export const getUserAppointments = async () => {
 
         const id = user.user.id
 
+        const cacheKey = `appointments:${id}`
+        const cached = await redis.get(cacheKey)
+
+        if (cached) {
+            try {
+                return {
+                    status: 200,
+                    message: "Appointments fetched successfully (from cache)",
+                    ...JSON.parse(cached as string)
+                }
+            } catch (error) {
+                await redis.del(cacheKey)
+            }
+
+        }
+
         const upcoming = await prisma.appointment.findMany({
             where: { userId: id, status: "CONFIRMED" },
             include: { doctor: true },
-            orderBy: { date: "asc" }  
+            orderBy: { date: "asc" }
         })
 
         const completed = await prisma.appointment.findMany({
             where: { userId: id, status: "COMPLETED" },
             include: { doctor: true },
-            orderBy: { date: "desc" }  
+            orderBy: { date: "desc" }
         })
+
+        await redis.set(
+            cacheKey,
+            JSON.stringify({ upcoming, completed }),
+            { ex: 300 }
+        )
 
         return {
             status: 200,

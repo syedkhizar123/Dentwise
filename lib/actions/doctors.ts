@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { prisma } from "../prisma"
 import { requireAuth } from "../middleware/auth"
+import { redis } from "../redis"
 
 export const createDoctor = async (req: Request) => {
 
@@ -37,6 +38,8 @@ export const createDoctor = async (req: Request) => {
                 imageUrl
             }
         })
+
+        await redis.del("all_doctors")
 
         return {
             status: 201,
@@ -102,6 +105,8 @@ export const updateDoctor = async (req: Request) => {
             data: updatedData
         })
 
+        await redis.del("all_doctors")
+
         return {
             status: 200,
             msg: "Doctor updated successfully",
@@ -128,6 +133,22 @@ export const getAllDoctors = async () => {
     try {
         const user = await requireAuth()
 
+        // await redis.del("all_doctors")
+        const cacheKey = "all_doctors"
+        const cached = await redis.get(cacheKey)
+
+        if (cached) {
+            try {
+                return {
+                    status: 200,
+                    msg: "Doctors fetched successfully (from cache)",
+                    doctors: JSON.parse(cached as string)
+                }
+            } catch {
+                await redis.del(cacheKey) 
+            }
+        }
+
         const doctors = await prisma.doctor.findMany({
             orderBy: {
                 createdAt: "desc"
@@ -136,6 +157,8 @@ export const getAllDoctors = async () => {
                 appointments: true
             }
         })
+
+        await redis.set(cacheKey, JSON.stringify(doctors), { ex: 300 })
 
         return {
             status: 200,

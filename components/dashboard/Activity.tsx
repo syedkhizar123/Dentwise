@@ -21,6 +21,7 @@ export const Activity = ({ total, completed, month, year }: ActivityProps) => {
             </div>
         )
     }
+    
     return (
         <div className="w-[95%] sm:w-[80%] mx-auto py-10 flex flex-col min-[860px]:flex-row justify-between items-start gap-5">
 
