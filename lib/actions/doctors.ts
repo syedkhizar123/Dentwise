@@ -131,9 +131,7 @@ export const updateDoctor = async (req: Request) => {
 
 export const getAllDoctors = async () => {
     try {
-        const user = await requireAuth()
 
-        // await redis.del("all_doctors")
         const cacheKey = "all_doctors"
         const cached = await redis.get(cacheKey)
 
@@ -145,9 +143,11 @@ export const getAllDoctors = async () => {
                     doctors: JSON.parse(cached as string)
                 }
             } catch {
-                await redis.del(cacheKey) 
+                await redis.del(cacheKey)
             }
         }
+
+        const user = await requireAuth()
 
         const doctors = await prisma.doctor.findMany({
             orderBy: {

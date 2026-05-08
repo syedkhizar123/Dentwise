@@ -1,6 +1,5 @@
 "use server"
 
-import { cache } from "react"
 import { requireAuth } from "../middleware/auth"
 import { prisma } from "../prisma"
 import { redis } from "../redis"
@@ -40,6 +39,9 @@ export const createAppointment = async (req: Request) => {
             }
         })
 
+        const cacheKey = `appointments:${user.user.id}`
+        await redis.del(cacheKey)
+
         return {
             status: 201,
             msg: "Appointment created successfully",
@@ -72,9 +74,6 @@ export const getAllAppointments = async () => {
                 createdAt: "desc"
             }
         })
-
-        const cacheKey = `appointments:${user.user.id}`
-        await redis.del(cacheKey)
 
         return {
             status: 200,
