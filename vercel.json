@@ -2,11 +2,11 @@
     "crons": [
         {
             "path": "/api/cron/subscription-expiry",
-            "schedule": "0 * * * *"
+            "schedule": "0 0 * * *"
         },
         {
             "path": "/api/cron/appointments-status",
-            "schedule": "0 * * * *"
+            "schedule": "0 0 * * *"
         }
     ]
 }
