@@ -17,7 +17,7 @@ export const Pricing = () => {
         }
     }, [user])
 
-    const handleSubscribe = async (plan: "STANDARD" | "PRO") => {
+    const handleSubscribe = async (plan: "FREE" | "STANDARD" | "PRO") => {
         try {
             const res = await fetch("/api/billing/checkout", {
                 method: "POST",
@@ -106,7 +106,7 @@ export const Pricing = () => {
                         </div>
                     </div>
 
-                    <button onClick={() => {toast.error("Downgrade is not possible")}} className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-5 ${currentPlan === "FREE" ? "invisible" : "visible"}`} >
+                    <button onClick={() => { handleSubscribe("FREE")}} className={`mx-3 flex justify-center items-center bg-amber-500 rounded-sm text-muted text-sm py-2 mb-5 ${currentPlan === "FREE" ? "invisible" : "visible"}`} >
                         Switch to this plan
                     </button>
 

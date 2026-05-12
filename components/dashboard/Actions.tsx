@@ -1,10 +1,13 @@
 import { Calendar, MessageSquare } from "lucide-react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 
 export const Actions = () => {
+
+    const router = useRouter()
     return (
-        <div className="w-[95%] sm:w-[80%] mx-auto flex flex-col md:flex-row justify-between items-center py-5 sm:py-10">
+        <div className="w-[95%] sm:w-[80%] mx-auto flex flex-col md:flex-row justify-between items-center py-5 sm:py-10 gap-5">
 
             <div className="w-full md:w-[48%] flex flex-col gap-5 px-5 py-10 border border-muted/15 rounded-3xl">
                 <div className="flex gap-3 ">
@@ -31,7 +34,7 @@ export const Actions = () => {
                     <p className="text-muted/80 text-sm">Instant pain relief advice</p>
                 </div>
 
-                <button className="flex justify-center gap-3 rounded-full w-full py-3 bg-primary">
+                <button onClick={() => { router.push("/voice")}} className="flex justify-center gap-3 rounded-full w-full py-3 bg-primary">
                     <MessageSquare size={20} className="text-white" />
                     <p className="text-white">Start Voice Call</p>
                 </button>
@@ -62,7 +65,7 @@ export const Actions = () => {
                     <p className="text-muted/80 text-sm">Instant confirmations</p>
                 </div>
 
-                <button className="flex justify-center gap-3 rounded-full w-full py-3 bg-muted/5 border border-muted/15">
+                <button onClick={() => router.push("/appointments")} className="flex justify-center gap-3 rounded-full w-full py-3 bg-muted/5 border border-muted/15">
                     <Calendar size={20} className="text-white" />
                     <p className="text-white">Schedule Now</p>
                 </button>

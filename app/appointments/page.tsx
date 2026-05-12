@@ -147,7 +147,7 @@ const Appointments = () => {
                             {
                                 (activeStep === 1 && selectedDoctor) && (
                                     <button onClick={() => { setActiveStep(2) }} className="bg-primary text-muted py-1 px-5 rounded-sm ">
-                                        Next
+                                        Time Selection
                                     </button>
                                 )
                             }

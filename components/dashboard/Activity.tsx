@@ -1,5 +1,6 @@
 import { getUserAppointments } from "@/hooks/useAppointments"
 import { Brain, Calendar, Clock, MessageSquare, User } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface ActivityProps {
     total?: string
@@ -10,6 +11,7 @@ interface ActivityProps {
 
 export const Activity = ({ total, completed, month, year }: ActivityProps) => {
 
+    const router = useRouter()
     const { data, isLoading } = getUserAppointments()
     const upcoming = data?.upcoming
     console.log(upcoming)
@@ -35,18 +37,18 @@ export const Activity = ({ total, completed, month, year }: ActivityProps) => {
                     <p className="text-muted-foreground text-xs">Keep track of your dental care journey</p>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                    <div className="rounded-lg px-12 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                <div className="flex flex-wrap gap-2">
+                    <div className="w-full md:w-[31%] rounded-lg px-2 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">{completed}</p>
-                        <p className="text-muted-foreground text-sm">Completed Visits</p>
+                        <p className="text-muted-foreground text-sm">Completed </p>
                     </div>
 
-                    <div className="rounded-lg px-12 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="w-full md:w-[31%] rounded-lg px-2 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">{total}</p>
-                        <p className="text-muted-foreground text-sm">Total Appointments</p>
+                        <p className="text-muted-foreground text-sm">Appointments</p>
                     </div>
 
-                    <div className="rounded-lg px-12 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
+                    <div className="w-full md:w-[31%] rounded-lg px-2 py-4 flex flex-col justify-center items-center bg-muted/5 mx-auto min-[780px]:mx-0 ">
                         <p className="text-2xl font-bold text-primary">{month} {year}</p>
                         <p className="text-muted-foreground text-sm">Member Since</p>
                     </div>
@@ -61,11 +63,11 @@ export const Activity = ({ total, completed, month, year }: ActivityProps) => {
                         <p className="text-primary font-semibold">Ready to get started ? </p>
                         <p className="text-sm text-muted/30">Book your first appointment or try our AI voice assistant for instant dental advice.</p>
                         <div className="flex flex-col min-[425px]:flex-row gap-3 mt-4">
-                            <button className="px-5 py-2 rounded-md bg-primary text-sm text-black">
+                            <button onClick={() => router.push("/voice")} className="px-5 py-2 rounded-md bg-primary text-sm text-black">
                                 Try AI Assistant
                             </button>
 
-                            <button className="px-5 py-2 rounded-md bg-muted-foreground/15 text-sm text-muted">
+                            <button onClick={() => router.push("/appointments")} className="px-5 py-2 rounded-md bg-muted-foreground/15 text-sm text-muted">
                                 Book Appointment
                             </button>
                         </div>

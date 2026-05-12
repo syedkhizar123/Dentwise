@@ -17,7 +17,8 @@ export async function POST(req: Request) {
         } else if (plan === "PRO") {
             priceId = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!
         } else {
-            return NextResponse.json({ error: "Invalid plan" }, { status: 400 })
+            // return NextResponse.json({ error: "Invalid plan" }, { status: 400 })
+            priceId = "FREE"
         }
 
         const user = await prisma.user.findUnique({
@@ -30,32 +31,6 @@ export async function POST(req: Request) {
 
         let activeSubscription: Stripe.Subscription | null = null;
 
-        // if (user?.stripeSubscriptionId) {
-        //     try {
-        //         const sub = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-
-        //         if (sub.status === "active" || sub.status === "trialing") {
-        //             activeSubscription = sub;
-        //         } else {
-        //             await prisma.user.update({
-        //                 where: { id: userId },
-        //                 data: {
-        //                     stripeSubscriptionId: null,
-        //                     plan: "FREE"
-        //                 }
-        //             });
-        //         }
-        //     } catch (err) {
-        //         await prisma.user.update({
-        //             where: { id: userId },
-        //             data: {
-        //                 stripeSubscriptionId: null,
-        //                 plan: "FREE"
-        //             }
-        //         });
-        //     }
-        // }
-
         if (user?.stripeCustomerId) {
             const subs = await stripe.subscriptions.list({
                 customer: user.stripeCustomerId,
@@ -66,13 +41,6 @@ export async function POST(req: Request) {
             activeSubscription = subs.data[0] || null;
         }
 
-        console.log("==== DEBUG PLAN CHECK ====");
-        console.log("DB plan:", user?.plan);
-        console.log("currentPriceId:", activeSubscription ? activeSubscription.items.data[0].price.id : "No active subscription");
-        console.log("requested priceId:", priceId);
-        console.log("STANDARD_PRICE:", process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID);
-        console.log("PRO_PRICE:", process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID);
-        console.log("==========================");
         if (activeSubscription) {
 
             const currentPriceId = activeSubscription.items.data[0].price.id
@@ -80,13 +48,13 @@ export async function POST(req: Request) {
             const STANDARD_PRICE = process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID!
             const PRO_PRICE = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!
 
-            // ✅ Already on same plan
+            // Already on same plan
             if (currentPriceId === priceId) {
                 return NextResponse.json({ error: "You are already on this plan." }, { status: 400 })
             }
 
-            // ❌ Block downgrade
-            if (currentPriceId === PRO_PRICE && priceId === STANDARD_PRICE) {
+            // Block downgrade
+            if ((currentPriceId === PRO_PRICE && priceId !== PRO_PRICE) || (priceId === STANDARD_PRICE && currentPriceId !== PRO_PRICE) ) {
                 return NextResponse.json({
                     downgradeBlocked: true,
                     message: "Downgrade is not possible."

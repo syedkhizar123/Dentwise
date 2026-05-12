@@ -27,6 +27,21 @@ export const createAppointment = async (req: Request) => {
             }
         }
         const isoDate = new Date(date);
+
+        const existing = await prisma.appointment.findFirst({
+            where: {
+                doctorId,
+                date: isoDate,
+                time
+            }
+        })
+
+        if (existing) {
+            return {
+                status: 400,
+                msg: "This slot is already booked",
+            }
+        }
         const newAppointment = await prisma.appointment.create({
             data: {
                 date: isoDate,
