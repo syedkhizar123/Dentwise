@@ -194,7 +194,7 @@ export const getAvailableDoctors = async () => {
             include: {
                 _count: {
                     select: { appointments: true }
-                }
+                },
             }
         })
 

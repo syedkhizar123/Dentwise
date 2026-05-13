@@ -57,7 +57,7 @@ export const DoctorInfo = ({ onSelectDoctor }: { onSelectDoctor?: (doctor: selec
                                         <div className="flex flex-col gap-1">
                                             <p className="text-muted text-lg font-bold">Dr. {doctor.name}</p>
                                             <p className="text-sm text-primary font-semibold">{doctor.speciality}</p>
-                                            <p className="text-muted-foreground text-sm">({doctor.appointments.length}) appointments</p>
+                                            <p className="text-muted-foreground text-sm">({doctor._count.appointments}) appointments</p>
                                         </div>
                                     </div>
 

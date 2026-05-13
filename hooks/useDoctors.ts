@@ -6,7 +6,7 @@ export const getDoctors = () => {
     return useQuery({
         queryKey: ["doctors"],
         queryFn: async () => {
-            const res = await fetch("/api/doctors/get-all")
+            const res = await fetch("/api/doctors/get-available")
             const data = await res.json()
             if (!res.ok) {
                 throw new Error(data?.msg || "Failed to fetch")

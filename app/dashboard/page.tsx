@@ -12,7 +12,7 @@ import { useEffect } from "react"
 
 const Dashboard = () => {
 
-    const { data , isLoading , isError , error} = getUserAppointmentsStats() 
+    const { data , isLoading , isError } = getUserAppointmentsStats() 
     const { mutate } = useSyncUser()
     const { isSignedIn, user, isLoaded } = useUser()
     const router = useRouter()
